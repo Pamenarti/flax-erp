@@ -90,17 +90,37 @@ export default function Layout({ children }) {
         // Aktif modülleri getir
         const response = await api.get('/modules/active');
         
-        // Modülleri kategoriye göre grupla
+        // Modülleri kategoriye göre grupla ve sırala
         const groupedModules = response.data.reduce((acc, module) => {
           const category = module.category || 'Diğer';
           if (!acc[category]) {
             acc[category] = [];
           }
           acc[category].push(module);
+          
+          // Alt kategori içinde sırala
+          acc[category].sort((a, b) => a.order - b.order);
+          
           return acc;
         }, {});
         
-        setModules(groupedModules);
+        // Kategorileri sırala - Sistem kategorisi her zaman en üstte
+        const orderedModules = {};
+        
+        // Önce Sistem kategorisi
+        if (groupedModules['Sistem']) {
+          orderedModules['Sistem'] = groupedModules['Sistem'];
+          delete groupedModules['Sistem'];
+        }
+        
+        // Sonra diğer kategoriler alfabetik
+        Object.keys(groupedModules)
+          .sort()
+          .forEach(key => {
+            orderedModules[key] = groupedModules[key];
+          });
+        
+        setModules(orderedModules);
         setLoading(false);
       } catch (error) {
         console.error('Veri alınamadı:', error);
@@ -379,6 +399,7 @@ export default function Layout({ children }) {
                 minHeight: 48,
                 justifyContent: open ? 'initial' : 'center',
                 px: 2.5,
+                bgcolor: isActive('/dashboard') ? 'action.selected' : 'transparent',
               }}
             >
               <ListItemIcon
@@ -393,6 +414,9 @@ export default function Layout({ children }) {
               <ListItemText 
                 primary="Dashboard" 
                 sx={{ opacity: open ? 1 : 0 }} 
+                primaryTypographyProps={{
+                  fontWeight: isActive('/dashboard') ? 'bold' : 'normal',
+                }}
               />
             </ListItemButton>
           </ListItem>
@@ -407,8 +431,9 @@ export default function Layout({ children }) {
                     primary={category}
                     primaryTypographyProps={{
                       fontSize: 12,
-                      fontWeight: 'medium',
-                      color: 'text.secondary',
+                      fontWeight: 'bold', // Daha belirgin kategori başlığı
+                      color: 'primary.main',
+                      textTransform: 'uppercase',
                     }}
                   />
                 </ListItem>
@@ -424,6 +449,10 @@ export default function Layout({ children }) {
                       minHeight: 48,
                       justifyContent: open ? 'initial' : 'center',
                       px: 2.5,
+                      bgcolor: isActive(module.route) ? 'action.selected' : 'transparent',
+                      '&:hover': {
+                        bgcolor: 'action.hover',
+                      }
                     }}
                   >
                     <ListItemIcon
@@ -431,6 +460,7 @@ export default function Layout({ children }) {
                         minWidth: 0,
                         mr: open ? 3 : 'auto',
                         justifyContent: 'center',
+                        color: isActive(module.route) ? 'primary.main' : 'inherit',
                       }}
                     >
                       {getModuleIcon(module.icon)}
@@ -438,6 +468,10 @@ export default function Layout({ children }) {
                     <ListItemText 
                       primary={module.name} 
                       sx={{ opacity: open ? 1 : 0 }} 
+                      primaryTypographyProps={{
+                        fontWeight: isActive(module.route) ? 'bold' : 'normal',
+                        fontSize: 14,
+                      }}
                     />
                   </ListItemButton>
                 </ListItem>
@@ -456,6 +490,7 @@ export default function Layout({ children }) {
                 minHeight: 48,
                 justifyContent: open ? 'initial' : 'center',
                 px: 2.5,
+                bgcolor: isActive('/settings') ? 'action.selected' : 'transparent',
               }}
             >
               <ListItemIcon
@@ -470,6 +505,9 @@ export default function Layout({ children }) {
               <ListItemText 
                 primary="Ayarlar" 
                 sx={{ opacity: open ? 1 : 0 }} 
+                primaryTypographyProps={{
+                  fontWeight: isActive('/settings') ? 'bold' : 'normal',
+                }}
               />
             </ListItemButton>
           </ListItem>

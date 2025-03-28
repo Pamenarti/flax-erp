@@ -63,16 +63,19 @@ const StatCard = ({ title, value, icon, color, compareText, onClick }) => (
 
 // Modül kartı bileşeni
 const ModuleCard = ({ module, onClick }) => (
-  <Card sx={{ 
-    height: '100%',
-    cursor: 'pointer',
-    transition: 'all 0.2s',
-    '&:hover': {
-      transform: 'translateY(-4px)',
-      boxShadow: 3
-    }
-  }}>
-    <CardActionArea onClick={onClick} sx={{ height: '100%' }}>
+  <Card 
+    sx={{ 
+      height: '100%',
+      cursor: 'pointer',
+      transition: 'all 0.2s',
+      '&:hover': {
+        transform: 'translateY(-4px)',
+        boxShadow: 3
+      }
+    }}
+    onClick={onClick}
+  >
+    <CardActionArea sx={{ height: '100%' }}>
       <CardContent>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
           <Avatar 
@@ -99,7 +102,7 @@ const ModuleCard = ({ module, onClick }) => (
   </Card>
 );
 
-export default function Dashboard() {
+function Dashboard() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [serverInfo, setServerInfo] = useState(null);
@@ -141,9 +144,9 @@ export default function Dashboard() {
           api.get('/modules/active')
         ]);
         
-        // Son eklenen 4 modülü göster
+        // Tüm modüller içinden rastgele 4 tanesini göster (veya son eklenenler)
         const recentModules = allModulesResponse.data
-          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .sort(() => 0.5 - Math.random()) // Rastgele sırala
           .slice(0, 4);
         
         setModules(recentModules);
@@ -429,5 +432,14 @@ export default function Dashboard() {
         </Typography>
       </Box>
     </Container>
+  );
+}
+
+// ModuleGuard ile sarmala ve export et
+export default function DashboardWithGuard() {
+  return (
+    <ModuleGuard moduleCode="core">
+      <Dashboard />
+    </ModuleGuard>
   );
 }

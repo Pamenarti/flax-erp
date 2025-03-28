@@ -8,6 +8,7 @@ import theme from '../styles/theme';
 import createEmotionCache from '../styles/createEmotionCache';
 import Layout from '../components/Layout';
 import { useRouter } from 'next/router';
+import ModuleGuard from '../components/ModuleGuard';
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -20,6 +21,9 @@ export default function MyApp(props) {
   const noLayoutPages = ['/login', '/register', '/forgot-password', '/reset-password'];
   const shouldUseLayout = !noLayoutPages.includes(router.pathname);
 
+  // Her sayfada ModuleGuard kontrolü otomatik eklemiyoruz
+  // Her sayfa kendi ModuleGuard'ını kullanmalı çünkü farklı modüller farklı sayfalara karşılık geliyor
+  
   return (
     <CacheProvider value={emotionCache}>
       <Head>

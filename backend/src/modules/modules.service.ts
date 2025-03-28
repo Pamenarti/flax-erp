@@ -121,11 +121,11 @@ export class ModulesService {
       {
         code: 'core',
         name: 'Çekirdek Sistem',
-        description: 'Temel sistem bileşenleri',
+        description: 'Temel sistem bileşenleri ve gösterge paneli',
         isActive: true,
         isCore: true,
         version: '1.0.0',
-        icon: 'SettingsIcon',
+        icon: 'DashboardIcon',
         route: '/dashboard',
         order: 1,
         category: 'Sistem'

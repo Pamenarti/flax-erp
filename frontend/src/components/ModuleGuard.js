@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Box, Typography, Button, CircularProgress, Paper, Container } from '@mui/material';
+import { Box, Typography, Button, CircularProgress, Paper, Container, Alert } from '@mui/material';
 import ExtensionOffIcon from '@mui/icons-material/ExtensionOff';
 import api from '../config/api';
 
@@ -8,6 +8,7 @@ import api from '../config/api';
 const ModuleGuard = ({ children, moduleCode }) => {
   const [loading, setLoading] = useState(true);
   const [isModuleActive, setIsModuleActive] = useState(false);
+  const [error, setError] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -31,9 +32,11 @@ const ModuleGuard = ({ children, moduleCode }) => {
         setLoading(false);
       } catch (error) {
         console.error('Modül kontrolü yapılamadı:', error);
+        setError('Modül durumu kontrol edilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
         setLoading(false);
-        // Hata durumunda varsayılan olarak modülü aktif kabul edelim (sistem çalışmaya devam etsin)
-        setIsModuleActive(true);
+        
+        // Hata durumunda varsayılan davranış (artık erişime izin vermiyoruz)
+        setIsModuleActive(false);
       }
     };
 
@@ -48,6 +51,29 @@ const ModuleGuard = ({ children, moduleCode }) => {
     );
   }
 
+  // Hata durumunda kullanıcıyı bilgilendir
+  if (error) {
+    return (
+      <Container maxWidth="sm" sx={{ mt: 10 }}>
+        <Paper sx={{ p: 4, textAlign: 'center' }}>
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+          <Typography variant="body1" paragraph>
+            Modül durumu kontrol edilirken bir sorun oluştu. Lütfen daha sonra tekrar deneyin veya sistem yöneticinize başvurun.
+          </Typography>
+          <Button 
+            variant="contained" 
+            onClick={() => router.push('/login')}
+            sx={{ mt: 2 }}
+          >
+            Yeniden Giriş Yap
+          </Button>
+        </Paper>
+      </Container>
+    );
+  }
+
   // Modül aktif değilse erişim reddedildi mesajı göster
   if (!isModuleActive) {
     return (
@@ -57,17 +83,21 @@ const ModuleGuard = ({ children, moduleCode }) => {
           <Typography variant="h5" gutterBottom>
             Modül Etkin Değil
           </Typography>
-          <Typography variant="body1" paragraph sx={{ mb: 3 }}>
-            Bu modül şu anda etkinleştirilmemiş. Erişmek için sistem yöneticinize başvurun veya sistem ayarlarından modülü etkinleştirin.
+          <Typography variant="body1" paragraph>
+            "{moduleCode}" modülü etkinleştirilmemiş. Bu sayfaya erişmek için sistem yöneticinize başvurun veya modülü etkinleştirin.
           </Typography>
-          <Box sx={{ mt: 2 }}>
-            <Button variant="contained" onClick={() => router.push('/dashboard')}>
-              Dashboard'a Dön
+          <Box sx={{ mt: 4 }}>
+            <Button 
+              variant="contained" 
+              onClick={() => router.push('/login')}
+              sx={{ mr: 2 }}
+            >
+              Ana Sayfa
             </Button>
             {localStorage.getItem('user') && JSON.parse(localStorage.getItem('user')).roles?.includes('admin') && (
               <Button 
                 variant="outlined" 
-                sx={{ ml: 2 }}
+                color="primary"
                 onClick={() => router.push('/settings/modules')}
               >
                 Modül Ayarları

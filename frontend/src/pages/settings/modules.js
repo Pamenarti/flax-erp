@@ -4,7 +4,7 @@ import {
   Button, IconButton, AppBar, Toolbar, Grid, Switch, Chip, Dialog,
   DialogTitle, DialogContent, DialogActions, TextField, FormControlLabel,
   Tooltip, Divider, Alert, List, ListItem, ListItemText, ListItemIcon,
-  ListItemSecondaryAction, CircularProgress, Snackbar
+  ListItemSecondaryAction, CircularProgress, Snackbar, Avatar
 } from '@mui/material';
 import { useRouter } from 'next/router';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -45,6 +45,110 @@ const ModuleIcon = ({ iconName }) => {
   };
 
   return iconMap[iconName] || <ExtensionIcon />;
+};
+
+// Modül kart bileşeni
+const ModuleCard = ({ module, onToggle, onEdit, onInfo, onDelete }) => {
+  return (
+    <Card 
+      sx={{ 
+        height: '100%',
+        borderLeft: module.isActive ? '4px solid #4caf50' : '4px solid #f44336',
+        position: 'relative'
+      }}
+    >
+      <CardContent>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+          <Avatar 
+            sx={{ 
+              bgcolor: module.isActive ? 'success.light' : 'error.light',
+              mr: 2
+            }}
+          >
+            <ModuleIcon iconName={module.icon} />
+          </Avatar>
+          <Typography variant="h6">{module.name}</Typography>
+        </Box>
+        
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          {module.description || 'Açıklama bulunmuyor'}
+        </Typography>
+        
+        <Box sx={{ mb: 2 }}>
+          {module.isCore && (
+            <Chip 
+              label="Çekirdek" 
+              size="small" 
+              color="primary"
+              sx={{ mr: 1, mb: 1 }}
+            />
+          )}
+          <Chip 
+            label={module.isActive ? 'Aktif' : 'Pasif'} 
+            size="small" 
+            color={module.isActive ? 'success' : 'error'}
+            sx={{ mr: 1, mb: 1 }}
+          />
+          {module.category && (
+            <Chip 
+              label={module.category} 
+              size="small" 
+              variant="outlined"
+              sx={{ mb: 1 }}
+            />
+          )}
+        </Box>
+        
+        <Typography variant="caption" display="block" color="text.secondary">
+          Kod: {module.code} | Sürüm: {module.version || '1.0.0'}
+        </Typography>
+        {module.route && (
+          <Typography variant="caption" display="block" color="text.secondary">
+            Rota: {module.route}
+          </Typography>
+        )}
+      </CardContent>
+      <CardActions>
+        <Button 
+          size="small" 
+          startIcon={<InfoIcon />}
+          onClick={() => onInfo(module)}
+        >
+          Detaylar
+        </Button>
+        
+        {!module.isCore && (
+          <Button 
+            size="small" 
+            startIcon={<EditIcon />}
+            onClick={() => onEdit(module)}
+          >
+            Düzenle
+          </Button>
+        )}
+        
+        <Button 
+          size="small" 
+          color={module.isActive ? 'error' : 'success'}
+          onClick={() => onToggle(module)}
+          disabled={module.isCore && module.isActive} // Çekirdek ve aktifse devre dışı bırakılamaz
+        >
+          {module.isActive ? 'Devre Dışı Bırak' : 'Etkinleştir'}
+        </Button>
+        
+        {!module.isCore && (
+          <Button 
+            size="small" 
+            color="error"
+            startIcon={<DeleteIcon />}
+            onClick={() => onDelete(module)}
+          >
+            Sil
+          </Button>
+        )}
+      </CardActions>
+    </Card>
+  );
 };
 
 export default function ModuleSettings() {
@@ -237,6 +341,30 @@ export default function ModuleSettings() {
     });
   };
 
+  // Modülleri kategoriye göre değil, kart görünümünde göstermek için düzenleme
+  const renderModuleCards = () => {
+    const allModules = [];
+    Object.values(modules).forEach(categoryModules => {
+      allModules.push(...categoryModules);
+    });
+
+    return (
+      <Grid container spacing={3}>
+        {allModules.map(module => (
+          <Grid item xs={12} sm={6} md={4} key={module.id}>
+            <ModuleCard 
+              module={module}
+              onToggle={handleToggleModule}
+              onEdit={(module) => handleOpenDialog('edit', module)}
+              onInfo={(module) => handleOpenDialog('info', module)}
+              onDelete={(module) => handleOpenDialog('delete', module)}
+            />
+          </Grid>
+        ))}
+      </Grid>
+    );
+  };
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -289,113 +417,27 @@ export default function ModuleSettings() {
             Flax-ERP sisteminin modüllerini bu sayfadan yönetebilirsiniz. 
             İhtiyacınıza göre modülleri etkinleştirebilir veya devre dışı bırakabilirsiniz.
           </Typography>
+          <Alert severity="warning" sx={{ mb: 3 }}>
+            <Typography variant="body1">
+              <strong>Önemli:</strong> Modüller, etkinleştirilmeden kullanılamaz. Etkinleştirilmeyen modüllere erişim engellenmiştir.
+            </Typography>
+          </Alert>
           <Alert severity="info" sx={{ mb: 3 }}>
-            Çekirdek modüller sistemin çalışması için gereklidir ve silinemez.
+            Çekirdek modüller sistemin çalışması için gereklidir ve devre dışı bırakılamaz.
           </Alert>
         </Paper>
-
-        {/* Modül Kategorileri */}
-        {Object.entries(modules).map(([category, moduleList]) => (
-          <Paper key={category} sx={{ p: 3, mb: 4 }}>
-            <Typography variant="h6" gutterBottom>
-              {category}
-            </Typography>
-            <Divider sx={{ mb: 2 }} />
-            
-            <List>
-              {moduleList.map((module) => (
-                <ListItem 
-                  key={module.id}
-                  sx={{ 
-                    mb: 1, 
-                    borderRadius: 1,
-                    bgcolor: module.isActive ? 'action.hover' : 'inherit',
-                    '&:hover': { bgcolor: 'action.selected' }
-                  }}
-                >
-                  <ListItemIcon>
-                    <ModuleIcon iconName={module.icon} />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        {module.name}
-                        {module.isCore && (
-                          <Chip 
-                            label="Çekirdek" 
-                            size="small" 
-                            color="primary"
-                            sx={{ ml: 1 }}
-                          />
-                        )}
-                      </Box>
-                    }
-                    secondary={
-                      <Box>
-                        <Typography variant="caption" display="block">
-                          Kod: {module.code} | Sürüm: {module.version || '1.0.0'}
-                        </Typography>
-                        <Typography variant="body2" sx={{ mt: 0.5 }}>
-                          {module.description || 'Açıklama bulunmuyor'}
-                        </Typography>
-                      </Box>
-                    }
-                  />
-                  <ListItemSecondaryAction>
-                    <Tooltip title="Bilgi">
-                      <IconButton 
-                        edge="end" 
-                        aria-label="info"
-                        onClick={() => handleOpenDialog('info', module)}
-                        sx={{ mr: 1 }}
-                      >
-                        <InfoIcon />
-                      </IconButton>
-                    </Tooltip>
-                    
-                    {!module.isCore && (
-                      <Tooltip title="Düzenle">
-                        <IconButton 
-                          edge="end" 
-                          aria-label="edit"
-                          onClick={() => handleOpenDialog('edit', module)}
-                          sx={{ mr: 1 }}
-                        >
-                          <EditIcon />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                    
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={module.isActive}
-                          onChange={() => handleToggleModule(module)}
-                          disabled={module.isCore}
-                        />
-                      }
-                      label={module.isActive ? "Aktif" : "Pasif"}
-                      labelPlacement="start"
-                    />
-                    
-                    {!module.isCore && (
-                      <Tooltip title="Sil">
-                        <IconButton 
-                          edge="end" 
-                          aria-label="delete"
-                          onClick={() => handleOpenDialog('delete', module)}
-                          color="error"
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                  </ListItemSecondaryAction>
-                </ListItem>
-              ))}
-            </List>
-          </Paper>
-        ))}
+        
+        {/* Modül kartları veya listeleri*/}
+        <Paper sx={{ p: 3 }}>
+          {/* İsterseniz burada tab menü ekleyebilirsiniz */}
+          {Object.keys(modules).length === 0 ? (
+            <Alert severity="info">
+              Şu anda hiç modül bulunmuyor. Yeni modül eklemek için "Yeni Modül" butonunu kullanabilirsiniz.
+            </Alert>
+          ) : (
+            renderModuleCards()
+          )}
+        </Paper>
       </Container>
 
       {/* Diyalog pencereleri */}

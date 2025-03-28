@@ -206,3 +206,12 @@ export default function Settings() {
     </Box>
   );
 }
+
+// ModuleGuard ile sarmala ve export et
+export default function SettingsWithGuard() {
+  return (
+    <ModuleGuard moduleCode="settings">
+      <Settings />
+    </ModuleGuard>
+  );
+}
