@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Veritabanı
+  db:
+    image: postgres:14-alpine
+    container_name: flax-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: flaxerp
+      POSTGRES_USER: flaxuser
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-flaxpassword}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - flax-network
+
+  # Backend (NestJS)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ../docker/backend/Dockerfile
+    container_name: flax-backend
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgres://flaxuser:${DB_PASSWORD:-flaxpassword}@db:5432/flaxerp
+      - JWT_SECRET=${JWT_SECRET:-flaxsecretkey}
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - flax-network
+
+  # Frontend (Nuxt.js)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../docker/frontend/Dockerfile
+    container_name: flax-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      - NODE_ENV=development
+      - API_URL=http://backend:3001
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - flax-network
+
+  # Adminer - Veritabanı yönetim aracı (geliştirme aşamasında)
+  adminer:
+    image: adminer
+    container_name: flax-adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    networks:
+      - flax-network
+
+networks:
+  flax-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
