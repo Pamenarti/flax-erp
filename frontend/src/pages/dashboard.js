@@ -162,6 +162,47 @@ export default function Dashboard() {
           lowStock: 5  // Düşük stok ürün sayısı
         });
         
+        // 4. Uyarılar - Stok uyarılarını ekledik
+        setAlerts([
+          {
+            id: 1,
+            type: 'success',
+            message: 'Sistem başarıyla güncellendi',
+            time: '10 dakika önce'
+          },
+          {
+            id: 2,
+            type: 'error',
+            message: 'Stok azalıyor: Ürün #1234',
+            time: '1 saat önce',
+            link: '/inventory'
+          },
+          {
+            id: 3,
+            type: 'info',
+            message: 'Yeni kullanıcı kaydoldu',
+            time: '3 saat önce'
+          },
+          {
+            id: 4,
+            type: 'warning',
+            message: '5 ürün kritik stok seviyesinde',
+            time: '2 saat önce',
+            link: '/inventory?tab=low-stock'
+          }
+        ]);
+        
+        setLoading(false);
+      } catch (error) {
+        console.error('Veri alınamadı:', error);
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, [router]);
+
+  if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <CircularProgress />
@@ -171,45 +212,13 @@ export default function Dashboard() {
 
   if (!user) return null;
 
+  // Modülleri kategorilere göre grupla
+  const operationalModules = modules.filter(m => m.category === 'Operasyon');
+  const activeModulesCount = modules.filter(m => m.isActive).length;
+  const totalModules = modules.length;
+
   return (
     <Box sx={{ flexGrow: 1 }}>
-      {/* Uygulama Çubuğu */}
-      <AppBar position="static">
-        <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Flax-ERP Dashboard
-          </Typography>
-          <IconButton color="inherit">
-            <NotificationsIcon />
-          </IconButton>
-          <Box sx={{ display: 'flex', alignItems: 'center', ml: 2 }}>
-            <Avatar sx={{ bgcolor: 'secondary.main', marginRight: 1 }}>
-              {user?.firstName?.[0]}{user?.lastName?.[0]}
-            </Avatar>
-            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-              <Typography variant="body2" component="div">
-                {user?.firstName} {user?.lastName}
-              </Typography>
-              <Typography variant="caption" component="div">
-                {user?.roles?.includes('admin') ? 'Yönetici' : 'Kullanıcı'}
-              </Typography>
-            </Box>
-          </Box>
-          <IconButton color="inherit" onClick={handleLogout} sx={{ ml: 2 }}>
-            <LogoutIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-      
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         {/* Karşılama kartı */}
         <Paper
@@ -243,7 +252,7 @@ export default function Dashboard() {
               sx={{ mr: 1, mb: 1, color: 'white', borderColor: 'white' }} 
             />
             <Chip 
-              label={`Aktif Modüller: ${activeModules}/12`} 
+              label={`Aktif Modüller: ${activeModulesCount}/${totalModules}`} 
               color="secondary" 
               variant="outlined" 
               sx={{ mb: 1, color: 'white', borderColor: 'white' }} 
@@ -260,6 +269,7 @@ export default function Dashboard() {
               icon={<PeopleIcon />}
               color="primary"
               compareText="+2 bu hafta"
+              onClick={() => router.push('/users')}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
@@ -291,6 +301,55 @@ export default function Dashboard() {
             />
           </Grid>
         </Grid>
+        
+        {/* Modüller */}
+        <Paper sx={{ p: 3, mb: 4 }}>
+          <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
+            <ExtensionIcon sx={{ mr: 1 }} /> Modüller
+          </Typography>
+          <Typography variant="body2" color="text.secondary" paragraph>
+            Aşağıdaki modüller sisteminizde kurulu. Modül durumları ve bilgileri için tıklayın.
+          </Typography>
+          <Divider sx={{ my: 2 }} />
+          
+          <Grid container spacing={3}>
+            {operationalModules.map((module) => (
+              <Grid item xs={12} sm={6} md={4} key={module.id}>
+                <ModuleCard 
+                  module={module} 
+                  onClick={() => {
+                    if (module.isActive) {
+                      router.push(module.route);
+                    } else {
+                      router.push('/settings/modules');
+                    }
+                  }}
+                />
+              </Grid>
+            ))}
+            
+            <Grid item xs={12} sm={6} md={4}>
+              <Card sx={{ height: '100%', border: '2px dashed #ccc' }}>
+                <CardActionArea 
+                  sx={{ height: '100%', p: 2 }}
+                  onClick={() => router.push('/settings/modules')}
+                >
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                    <Avatar sx={{ bgcolor: 'action.hover', width: 64, height: 64, mb: 2 }}>
+                      <ExtensionIcon fontSize="large" />
+                    </Avatar>
+                    <Typography variant="h6" component="div" gutterBottom>
+                      Modül Ekle
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                      Sisteminize yeni modüller ekleyin veya mevcut modülleri yönetin
+                    </Typography>
+                  </Box>
+                </CardActionArea>
+              </Card>
+            </Grid>
+          </Grid>
+        </Paper>
         
         {/* Grafikler ve Tablolar */}
         <Grid container spacing={3}>
