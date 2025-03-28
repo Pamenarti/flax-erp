@@ -1,6 +1,0 @@
-{
-  "name": "sales",
-  "description": "Müşteri, sipariş ve fatura yönetimi",
-  "version": "1.0.0",
-  "dependencies": ["core", "inventory"]
-}
