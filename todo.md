@@ -1,3 +1,57 @@
+# Flax-ERP Yapılacaklar Listesi
+
+## Öncelikli Görevler
+
+- [x] Temel proje yapısını oluştur
+- [x] Kullanıcı yönetimi sistemini kur
+- [x] Kredi sistemini oluştur
+- [x] Docker entegrasyonunu tamamla
+- [x] Temel modülleri ekle (Finans, Envanter)
+
+## Geliştirme Aşamasındaki Görevler
+
+- [ ] Grafikleri ve raporlama sistemini iyileştir
+- [ ] API test kapsamını artır
+- [ ] Frontend unit testlerini ekle
+- [ ] SEO optimizasyonunu yap
+- [ ] PWA desteği ekle
+- [ ] Çoklu dil desteği ekle
+- [ ] Tema yönetimini geliştir
+
+## Modül Geliştirme
+
+- [x] Finans modülü temel işlevler
+- [x] Envanter yönetimi temel işlevler
+- [ ] İnsan Kaynakları modülü geliştir
+- [ ] Satış ve CRM modülü geliştir
+- [ ] Üretim yönetimi modülü geliştir
+- [ ] e-Fatura entegrasyonu
+- [ ] Muhasebe modülü geliştir
+
+## Mimari İyileştirmeler
+
+- [ ] Mikroservis mimarisine geçiş araştırması
+- [ ] Redis cache entegrasyonu
+- [ ] Elasticsearch entegrasyonu
+- [ ] Message queue sistemi (RabbitMQ)
+- [ ] WebSocket entegrasyonu (gerçek zamanlı bildirimler için)
+
+## Güvenlik
+
+- [ ] OWASP güvenlik taraması yap
+- [ ] Rate limiting ekle
+- [ ] CSRF koruması güçlendir
+- [ ] 2FA (İki faktörlü kimlik doğrulama) ekle
+- [ ] Rol tabanlı erişim kontrolünü geliştir
+
+## DevOps
+
+- [ ] CI/CD pipeline oluştur
+- [ ] Otomatik deployment sistemi kur
+- [ ] Performans izleme araçları ekle
+- [ ] Log toplama ve analiz sistemi kur
+- [ ] Yedekleme ve kurtarma stratejileri geliştir
+
 # Flax-ERP Proje Todo Listesi
 todo.md de bulunan ERP + modül sistemi yapacağız fakat bu erp de normal web platform olacak ve üyelik sistemi ile modüller satacağız.
 

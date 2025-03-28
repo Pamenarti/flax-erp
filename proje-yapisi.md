@@ -1,50 +1,91 @@
 # Flax-ERP Proje Yapısı
 
-## Dizin Yapısı
+## Genel Bakış
+
+Flax-ERP, modüler mimariye sahip bir kurumsal kaynak planlama (ERP) sistemidir. Proje, frontend ve backend olarak iki ana bileşenden oluşur ve modüler bir yapıda geliştirilmiştir.
+
+## Klasör Yapısı
 
 ```
 flax-erp/
-├── frontend/              # Nuxt.js frontend uygulaması
-│   ├── components/        # Yeniden kullanılabilir UI bileşenleri
-│   ├── layouts/           # Sayfa düzenleri (Default, Dashboard, vb.)
-│   ├── middleware/        # Nuxt.js middleware dosyaları
-│   ├── modules/           # Modüller için frontend bileşenleri
-│   ├── pages/             # Uygulama sayfaları
-│   ├── plugins/           # Uygulama eklentileri
-│   ├── static/            # Statik dosyalar (favicon, vb.)
-│   ├── store/             # Vuex mağazası
-│   └── nuxt.config.js     # Nuxt yapılandırması
-│
 ├── backend/               # NestJS backend uygulaması
-│   ├── src/
+│   ├── src/               # Kaynak kodlar
 │   │   ├── app.module.ts  # Ana modül
-│   │   ├── modules/       # ERP modülleri
-│   │   ├── auth/          # Kimlik doğrulama
-│   │   ├── users/         # Kullanıcı yönetimi
-│   │   ├── credits/       # Kredi sistemi
-│   │   └── common/        # Ortak kullanılan dosyalar
-│   └── nest-cli.json      # NestJS yapılandırması
+│   │   ├── auth/          # Kimlik doğrulama modülü
+│   │   ├── users/         # Kullanıcı yönetimi modülü
+│   │   ├── credits/       # Kredi sistemi modülü
+│   │   └── modules/       # Modül yönetimi
+│   ├── package.json       # Bağımlılıklar
+│   └── tsconfig.json      # TypeScript konfigürasyonu
 │
-├── modules/               # ERP modülleri (her modül kendi klasöründe)
+├── frontend/              # Nuxt.js frontend uygulaması
+│   ├── assets/            # Statik dosyalar
+│   ├── components/        # Vue bileşenleri
+│   ├── layouts/           # Sayfa düzenleri
+│   ├── middleware/        # Ara yazılımlar
+│   ├── pages/             # Sayfalar
+│   ├── plugins/           # Eklentiler
+│   ├── static/            # Statik dosyalar
+│   ├── nuxt.config.js     # Nuxt konfigürasyonu
+│   └── package.json       # Bağımlılıklar
+│
+├── modules/               # ERP modülleri
 │   ├── finance/           # Finans modülü
-│   ├── inventory/         # Envanter modülü
-│   ├── sales/             # Satış modülü
-│   ├── hr/                # İnsan kaynakları modülü
-│   └── ...                # Diğer modüller
+│   ├── inventory/         # Envanter yönetimi modülü
+│   └── [diğer modüller]   # Diğer modüller
 │
-├── docker/                # Docker yapılandırması
-│   ├── frontend/          # Frontend Docker dosyaları
-│   ├── backend/           # Backend Docker dosyaları
-│   └── database/          # Veritabanı Docker dosyaları
+├── docker/                # Docker yapılandırmaları
+│   ├── frontend/          # Frontend Docker yapılandırması
+│   └── backend/           # Backend Docker yapılandırması
 │
 ├── scripts/               # Betikler
-│   ├── start.sh           # Ana başlatma betiği
-│   └── ...                # Diğer yardımcı betikler
+│   └── start.sh           # Başlatma ve yönetim betiği
 │
-├── docker-compose.yml     # Docker Compose yapılandırması
-├── .env                   # Ortam değişkenleri
-└── README.md              # Proje açıklaması
+└── docker-compose.yml     # Docker Compose yapılandırması
 ```
+
+## Teknoloji Yığını
+
+- **Backend**: NestJS (Node.js), TypeScript
+- **Frontend**: Nuxt.js, Vue.js, Vuetify
+- **Veritabanı**: PostgreSQL
+- **Dağıtım**: Docker & Docker Compose
+- **API Dokümantasyonu**: Swagger
+
+## Modüler Yapı
+
+Her modül, kendi içinde bağımsız çalışabilen bir yapıdadır ve aşağıdaki bileşenlere sahiptir:
+
+1. **Backend API**: NestJS controller, service ve entity dosyaları
+2. **Frontend UI**: Vue.js bileşenleri ve sayfaları
+3. **Veritabanı Modeli**: Entity tanımları
+
+## Modül Geliştirme
+
+Yeni bir modül eklemek için:
+
+1. `modules/` klasörü altında yeni bir klasör oluşturun (örn: `modules/hr/`)
+2. Backend için gerekli controller, service ve entity dosyalarını ekleyin
+3. Frontend için gerekli bileşenleri ve sayfaları `frontend/pages/modules/[modül-adı]/` altında oluşturun
+4. Modülü `backend/src/app.module.ts` dosyasına kaydedin
+
+## Kimlik Doğrulama ve Yetkilendirme
+
+Sistem, JWT tabanlı bir kimlik doğrulama mekanizması kullanır:
+
+- `/auth/login` - Kullanıcı girişi
+- `/auth/register` - Yeni kullanıcı kaydı
+- `/auth/me` - Mevcut kullanıcı bilgisi
+
+Her API isteği için JWT token kontrolü yapılır.
+
+## Kredi Sistemi
+
+Modüller, kredi sistemi üzerinden aktive edilir:
+
+- Kullanıcılar kredi satın alabilir
+- Krediler, modül aktivasyonu için kullanılır
+- Kredi işlemleri transaction tablosunda takip edilir
 
 ## Veritabanı Şeması (Temel)
 
