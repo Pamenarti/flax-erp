@@ -1,0 +1,17 @@
+// Vuetify için değişkenler
+// Tema renklerini burada özelleştirebilirsiniz
+@import '~vuetify/src/styles/styles.sass';
+
+// Ana renkler
+$primary: #3F51B5;
+$secondary: #00796B;
+$accent: #FFC107;
+$error: #F44336;
+$info: #2196F3;
+$success: #4CAF50;
+$warning: #FF9800;
+
+// Tema ayarları
+$body-font-family: 'Roboto', sans-serif;
+$heading-font-family: 'Roboto', sans-serif;
+$border-radius-root: 4px;

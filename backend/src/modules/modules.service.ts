@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Module } from './entities/module.entity';
-import { UserModule } from './entities/user-module.entity';
+import { UserModule, UserModuleStatus } from './entities/user-module.entity';
 import { CreditsService } from '../credits/credits.service';
 
 @Injectable()
@@ -60,10 +60,10 @@ export class ModulesService {
       module: { id: moduleId },
       activated_at: now,
       expires_at: expiresAt,
-      status: 'active'
+      status: UserModuleStatus.ACTIVE
     });
     
-    return this.userModuleRepository.save(userModule);
+    return await this.userModuleRepository.save(userModule);
   }
 
   async getUserModules(userId: string): Promise<UserModule[]> {

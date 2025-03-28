@@ -1,23 +1,21 @@
 export default {
-  // Global page headers
+  // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: '%s - Flax ERP',
-    title: 'Flax-ERP',
+    title: 'Flax ERP',
     htmlAttrs: {
       lang: 'tr'
     },
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: 'Flax-ERP - Modüler ERP Sistemi' },
-      { name: 'format-detection', content: 'telephone=no' }
+      { hid: 'description', name: 'description', content: 'Flax ERP Sistemi' }
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
     ]
   },
 
-  // Global CSS
+  // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
     '@/assets/css/main.css'
   ],
@@ -28,30 +26,53 @@ export default {
     port: 3000
   },
 
-  // Plugins to run before rendering page
+  // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    '@/plugins/axios.js'
+    '~/plugins/axios.js'
   ],
 
-  // Auto import components
+  // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
 
-  // Modules for dev and build
+  // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
     '@nuxtjs/vuetify',
-    '@nuxtjs/eslint-module'
   ],
 
-  // Modules
+  // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     '@nuxtjs/axios',
     '@nuxtjs/auth-next',
-    '@nuxtjs/vuetify'
   ],
 
-  // Axios module configuration
+  // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
+  vuetify: {
+    customVariables: ['~/assets/variables.scss'],
+    treeShake: true,
+    defaultAssets: {
+      font: {
+        family: 'Roboto'
+      },
+    },
+    theme: {
+      light: true,
+      themes: {
+        light: {
+          primary: '#3F51B5',
+          secondary: '#00796B',
+          accent: '#FFC107',
+          error: '#F44336',
+          info: '#2196F3',
+          success: '#4CAF50',
+          warning: '#FF9800'
+        }
+      }
+    }
+  },
+
+  // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
-    baseURL: process.env.API_URL || 'http://88.218.130.67:3001/api',
+    baseURL: process.env.API_URL || 'http://localhost:3001/api',
     credentials: true
   },
 
@@ -60,12 +81,13 @@ export default {
     strategies: {
       local: {
         token: {
-          property: 'access_token',
+          property: 'token',
+          global: true,
           required: true,
           type: 'Bearer'
         },
         user: {
-          property: 'user',
+          property: false,
           autoFetch: true
         },
         endpoints: {
@@ -83,28 +105,36 @@ export default {
     }
   },
 
-  // Vuetify module configuration
-  vuetify: {
-    customVariables: ['~/assets/variables.scss'],
-    treeShake: true,
-    theme: {
-      dark: false,
-      themes: {
-        light: {
-          primary: '#1976D2',
-          secondary: '#424242',
-          accent: '#82B1FF',
-          error: '#FF5252',
-          info: '#2196F3',
-          success: '#4CAF50',
-          warning: '#FFC107'
-        }
-      }
-    }
+  // Router configuration
+  router: {
+    middleware: ['auth']
   },
 
-  // Build Configuration
+  // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    extend(config, ctx) {}
+    // Fixes for JavaScript parsing errors
+    babel: {
+      presets({ isServer }) {
+        return [
+          [
+            require.resolve('@nuxt/babel-preset-app'),
+            {
+              buildTarget: isServer ? 'server' : 'client',
+              corejs: { version: 3 }
+            }
+          ]
+        ]
+      }
+    },
+    // Transpile specific packages with issues
+    transpile: [
+      'vuetify/lib'
+    ],
+    // Enable source maps in development
+    extend(config, { isDev, isClient }) {
+      if (isDev && isClient) {
+        config.devtool = 'source-map'
+      }
+    }
   }
 }

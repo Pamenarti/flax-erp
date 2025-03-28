@@ -40,6 +40,8 @@ Modüler ERP sistemi. Kredi tabanlı modül aktivasyonu ile istediğiniz kadar m
 - `./scripts/start.sh restart` - Tüm servisleri yeniden başlatır
 - `./scripts/start.sh status` - Servislerin durumunu gösterir
 - `./scripts/start.sh logs` - Servislerin loglarını gösterir
+- `./scripts/start.sh install-deps` - Tüm bağımlılıkları yükler
+- `./scripts/start.sh clean` - Tüm bağımlılıkları ve kurulum dosyalarını temizler
 
 ### Erişim Bilgileri
 
@@ -64,6 +66,16 @@ npm install
 ```
 
 Alternatif olarak, `./scripts/start.sh setup` komutu tüm bağımlılıkları otomatik olarak yükler.
+
+### Temizleme İşlemi
+
+Tüm node_modules klasörlerini, docker imajlarını ve container'ları, ve derleme çıktılarını temizlemek için:
+
+```bash
+./scripts/start.sh clean
+```
+
+Bu komut tüm bağımlılıkları ve kurulum dosyalarını temizler. Tamamlanan temizleme işleminden sonra, tekrar kurmak için `./scripts/start.sh setup` komutunu kullanabilirsiniz.
 
 ## Teknoloji Yığını
 

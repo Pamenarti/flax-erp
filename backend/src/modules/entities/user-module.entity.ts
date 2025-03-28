@@ -5,6 +5,7 @@ import { Module } from './module.entity';
 export enum UserModuleStatus {
   ACTIVE = 'active',
   INACTIVE = 'inactive',
+  PENDING = 'pending',
   EXPIRED = 'expired',
 }
 
@@ -21,16 +22,16 @@ export class UserModule {
   @JoinColumn({ name: 'module_id' })
   module: Module;
 
-  @Column({ nullable: true })
+  @Column({ type: 'timestamp' })
   activated_at: Date;
 
-  @Column({ nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   expires_at: Date;
 
   @Column({
     type: 'enum',
     enum: UserModuleStatus,
-    default: UserModuleStatus.INACTIVE,
+    default: UserModuleStatus.ACTIVE,
   })
   status: UserModuleStatus;
 

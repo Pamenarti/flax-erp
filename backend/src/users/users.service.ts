@@ -73,14 +73,14 @@ export class UsersService {
   async getUserModules(userId: string): Promise<any[]> {
     const user = await this.usersRepository.findOne({
       where: { id: userId },
-      relations: ['userModules', 'userModules.module'],
+      relations: ['user_modules', 'user_modules.module'],
     });
     
     if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
     
-    return user.userModules.map(userModule => ({
+    return user.user_modules.map(userModule => ({
       id: userModule.module.id,
       name: userModule.module.name,
       description: userModule.module.description,

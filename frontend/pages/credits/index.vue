@@ -19,34 +19,34 @@
                 cols="12" 
                 sm="6" 
                 md="4" 
-                v-for="package in creditPackages" 
-                :key="package.id"
+                v-for="(pkg, index) in creditPackages" 
+                :key="index"
                 class="mb-4"
               >
                 <v-card 
                   class="d-flex flex-column h-100 package-card"
-                  :class="{ 'best-value': package.isBestValue }"
+                  :class="{ 'best-value': pkg.isBestValue }"
                   outlined
-                  :elevation="package.isBestValue ? 10 : 2"
+                  :elevation="pkg.isBestValue ? 10 : 2"
                 >
-                  <div v-if="package.isBestValue" class="best-value-badge">
+                  <div v-if="pkg.isBestValue" class="best-value-badge">
                     En Çok Tercih Edilen
                   </div>
                   <v-card-title class="primary--text">
-                    {{ package.name }}
+                    {{ pkg.name }}
                   </v-card-title>
                   <v-card-text class="flex-grow-1">
                     <div class="text-h4 font-weight-bold text-center mb-4">
-                      {{ formatCurrency(package.price) }}
+                      {{ formatCurrency(pkg.price) }}
                     </div>
                     <div class="text-center mb-3">
                       <v-chip color="primary" outlined>
-                        {{ package.credits }} Kredi
+                        {{ pkg.credits }} Kredi
                       </v-chip>
                     </div>
                     <v-divider class="my-3"></v-divider>
                     <ul class="pl-4">
-                      <li v-for="(feature, index) in package.features" :key="index">
+                      <li v-for="(feature, featureIndex) in pkg.features" :key="featureIndex">
                         {{ feature }}
                       </li>
                     </ul>
@@ -55,8 +55,8 @@
                     <v-btn 
                       block 
                       color="primary" 
-                      :outlined="!package.isBestValue"
-                      @click="selectPackage(package)"
+                      :outlined="!pkg.isBestValue"
+                      @click="selectPackage(pkg)"
                     >
                       Satın Al
                     </v-btn>
@@ -99,7 +99,7 @@
               @click="selectCustomPackage"
             >
               Satın Al
-            </v-btn>
+            </v-card>
           </v-card-text>
         </v-card>
       </v-col>

@@ -1,10 +1,14 @@
 {
   "name": "flax-erp-backend",
   "version": "0.0.1",
-  "description": "Flax-ERP Backend API",
-  "author": "",
+  "description": "Flax ERP Backend API",
+  "author": "Flax ERP Team",
   "private": true,
   "license": "UNLICENSED",
+  "engines": {
+    "node": ">=20.11.1 <21.0.0",
+    "npm": ">=10.2.4"
+  },
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -26,7 +30,7 @@
     "@nestjs/jwt": "^10.1.1",
     "@nestjs/passport": "^10.0.2",
     "@nestjs/platform-express": "^10.0.0",
-    "@nestjs/swagger": "^7.1.13",
+    "@nestjs/swagger": "^7.1.14",
     "@nestjs/typeorm": "^10.0.0",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
@@ -40,15 +44,15 @@
     "typeorm": "^0.3.17"
   },
   "devDependencies": {
-    "@nestjs/cli": "^10.0.0",
+    "@nestjs/cli": "^10.2.1",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",
-    "@types/bcrypt": "^5.0.0",
+    "@types/bcrypt": "^5.0.1",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.2",
     "@types/node": "^20.3.1",
-    "@types/passport-jwt": "^3.0.10",
-    "@types/passport-local": "^1.0.36",
+    "@types/passport-jwt": "^3.0.12",
+    "@types/passport-local": "^1.0.37",
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
