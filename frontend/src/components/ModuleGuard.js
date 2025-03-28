@@ -2,20 +2,30 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { Box, Typography, Button, CircularProgress, Paper, Container } from '@mui/material';
 import ExtensionOffIcon from '@mui/icons-material/ExtensionOff';
+import SettingsIcon from '@mui/icons-material/Settings';
 import api from '../config/api';
 
 // ModuleGuard bileşeni: Bir modülün aktif olup olmadığını kontrol eder
 const ModuleGuard = ({ children, moduleCode }) => {
   const [loading, setLoading] = useState(true);
   const [isModuleActive, setIsModuleActive] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     // Token kontrolü
     const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    
     if (!token) {
       router.push('/login');
       return;
+    }
+    
+    // Kullanıcı admin mi kontrol et
+    if (userData) {
+      const user = JSON.parse(userData);
+      setIsAdmin(user.roles?.includes('admin') || false);
     }
 
     // Modülün aktif olup olmadığını kontrol et
@@ -58,17 +68,23 @@ const ModuleGuard = ({ children, moduleCode }) => {
             Modül Etkin Değil
           </Typography>
           <Typography variant="body1" paragraph sx={{ mb: 3 }}>
-            Bu modül şu anda etkinleştirilmemiş. Erişmek için sistem yöneticinize başvurun veya sistem ayarlarından modülü etkinleştirin.
+            <strong>{moduleCode}</strong> modülü şu anda etkinleştirilmemiş. Erişmek için sistem yöneticinize başvurun veya sistem ayarlarından modülü etkinleştirin.
           </Typography>
-          <Box sx={{ mt: 2 }}>
-            <Button variant="contained" onClick={() => router.push('/dashboard')}>
-              Dashboard'a Dön
+          <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', gap: 2 }}>
+            <Button 
+              variant="contained" 
+              onClick={() => router.push('/dashboard')}
+              startIcon={<ExtensionOffIcon />}
+            >
+              Ana Sayfaya Dön
             </Button>
-            {localStorage.getItem('user') && JSON.parse(localStorage.getItem('user')).roles?.includes('admin') && (
+            
+            {isAdmin && (
               <Button 
                 variant="outlined" 
-                sx={{ ml: 2 }}
+                color="primary"
                 onClick={() => router.push('/settings/modules')}
+                startIcon={<SettingsIcon />}
               >
                 Modül Ayarları
               </Button>

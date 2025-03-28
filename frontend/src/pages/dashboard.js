@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Box, Container, Typography, Grid, Paper, Card, CardContent, Divider, 
+import { Box, Container, Typography, Grid, Paper, Divider, 
          CircularProgress, LinearProgress, List, ListItem, ListItemText, 
-         ListItemIcon, Button, AppBar, Toolbar, IconButton, Avatar, Chip } from '@mui/material';
+         ListItemIcon, Button, Chip, Card, CardActionArea,
+         CardContent, Avatar } from '@mui/material';
 import { useRouter } from 'next/router';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import InventoryIcon from '@mui/icons-material/Inventory';
@@ -9,15 +10,25 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import PeopleIcon from '@mui/icons-material/People';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import MenuIcon from '@mui/icons-material/Menu';
-import LogoutIcon from '@mui/icons-material/Logout';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
+import ExtensionIcon from '@mui/icons-material/Extension';
 import api from '../config/api';
 
 // İstatistik kartı bileşeni 
 const StatCard = ({ title, value, icon, color, compareText, onClick }) => (
-  <Card sx={{ height: '100%' }} onClick={onClick}>
+  <Card 
+    sx={{ 
+      height: '100%',
+      cursor: onClick ? 'pointer' : 'default',
+      transition: 'all 0.2s',
+      '&:hover': onClick ? {
+        transform: 'translateY(-4px)',
+        boxShadow: 3
+      } : {}
+    }}
+    onClick={onClick}
+  >
     <CardContent>
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <Box>
@@ -48,6 +59,62 @@ const StatCard = ({ title, value, icon, color, compareText, onClick }) => (
   </Card>
 );
 
+// Modül kartı bileşeni
+const ModuleCard = ({ module, onClick }) => {
+  // İkon haritası
+  const getIcon = (iconName) => {
+    const iconMap = {
+      'PeopleIcon': <PeopleIcon fontSize="large" />,
+      'InventoryIcon': <InventoryIcon fontSize="large" />,
+      'ShoppingCartIcon': <ShoppingCartIcon fontSize="large" />,
+      'BarChartIcon': <BarChartIcon fontSize="large" />,
+      'ExtensionIcon': <ExtensionIcon fontSize="large" />,
+    };
+    return iconMap[iconName] || <ExtensionIcon fontSize="large" />;
+  };
+  
+  return (
+    <Card
+      sx={{
+        height: '100%',
+        opacity: module.isActive ? 1 : 0.6,
+        transition: 'all 0.2s'
+      }}
+    >
+      <CardActionArea
+        sx={{ height: '100%', p: 2 }}
+        onClick={onClick}
+        disabled={!module.isActive}
+      >
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+          <Avatar
+            sx={{
+              bgcolor: module.isActive ? 'primary.light' : 'grey.300',
+              color: module.isActive ? 'primary.main' : 'grey.500',
+              width: 64,
+              height: 64,
+              mb: 2
+            }}
+          >
+            {getIcon(module.icon)}
+          </Avatar>
+          <Typography variant="h6" component="div" gutterBottom>
+            {module.name}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            {module.description}
+          </Typography>
+          <Chip
+            label={module.isActive ? 'Etkin' : 'Devre Dışı'}
+            color={module.isActive ? 'success' : 'default'}
+            size="small"
+          />
+        </Box>
+      </CardActionArea>
+    </Card>
+  );
+};
+
 export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -58,27 +125,8 @@ export default function Dashboard() {
     sales: 0,
     revenue: 0
   });
-  const [activeModules, setActiveModules] = useState(0);
-  const [alerts, setAlerts] = useState([
-    {
-      id: 1,
-      type: 'success',
-      message: 'Sistem başarıyla güncellendi',
-      time: '10 dakika önce'
-    },
-    {
-      id: 2,
-      type: 'error',
-      message: 'Stok azalıyor: Ürün #1234',
-      time: '1 saat önce'
-    },
-    {
-      id: 3,
-      type: 'info',
-      message: 'Yeni kullanıcı kaydoldu',
-      time: '3 saat önce'
-    }
-  ]);
+  const [alerts, setAlerts] = useState([]);
+  const [modules, setModules] = useState([]);
   
   const router = useRouter();
 
@@ -101,9 +149,8 @@ export default function Dashboard() {
         setServerInfo(healthResponse.data);
         
         // 2. Aktif modülleri getir
-        const modulesResponse = await api.get('/modules/active');
-        const activeModules = modulesResponse.data;
-        setActiveModules(activeModules.length);
+        const allModulesResponse = await api.get('/modules');
+        setModules(allModulesResponse.data);
         
         // 3. İstatistik verileri - Mock edilmiş ve stok bilgilerini ekledik
         // Gerçek uygulamada bu veriler API'den gelecek
@@ -115,53 +162,6 @@ export default function Dashboard() {
           lowStock: 5  // Düşük stok ürün sayısı
         });
         
-        // 4. Uyarılar - Stok uyarılarını ekledik
-        setAlerts([
-          {
-            id: 1,
-            type: 'success',
-            message: 'Sistem başarıyla güncellendi',
-            time: '10 dakika önce'
-          },
-          {
-            id: 2,
-            type: 'error',
-            message: 'Stok azalıyor: Ürün #1234',
-            time: '1 saat önce',
-            link: '/inventory'
-          },
-          {
-            id: 3,
-            type: 'info',
-            message: 'Yeni kullanıcı kaydoldu',
-            time: '3 saat önce'
-          },
-          {
-            id: 4,
-            type: 'warning',
-            message: '5 ürün kritik stok seviyesinde',
-            time: '2 saat önce',
-            link: '/inventory?tab=low-stock'
-          }
-        ]);
-        
-        setLoading(false);
-      } catch (error) {
-        console.error('Veri alınamadı:', error);
-        setLoading(false);
-      }
-    };
-    
-    fetchData();
-  }, [router]);
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    router.push('/login');
-  };
-  
-  if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <CircularProgress />
