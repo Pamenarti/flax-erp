@@ -75,109 +75,136 @@ export default {
       this.error = null;
       
       try {
-        // Önce doğrudan API'yi dene
-        let response;
+        console.log('Modüller alınmaya çalışılıyor...');ya çalışılıyor...');
+        // Önce geçici API uç noktasını denedan API'yi dene
+        let response;esponse;
         try {
-          response = await this.$api.get('/api/modules');
-        } catch (apiError) {
-          console.warn('Ana API uç noktasına bağlanılamadı, fallback deneniyor:', apiError);
-          // Ana API çalışmazsa, fallback dene
-          response = await this.$api.get('/api/modules/fallback');
-        }
-        
-        this.modules = response.data;
-        
+          response = await this.$api.get('/api/temp-modules');his.$api.get('/api/modules');
+          console.log('Geçici API yanıtı:', response.data);
+        } catch (tempApiError) {
+          console.warn('Geçici API uç noktasına bağlanılamadı:', tempApiError);rror);
+           
+          // Normal API'yi dene  // Önce fallback dene
+          try {
+            console.log('Normal API deneniyor...');    console.log('Fallback API deneniyor...');
+            response = await this.$api.get('/api/modules');it this.$api.get('/api/modules/fallback');
+            console.log('Normal API yanıtı:', response.data);data);
+          } catch (apiError) {
+            console.warn('Normal API uç noktasına bağlanılamadı:', apiError);:', fallbackError);
+               // Son çare olarak varsayılan verileri kullan
+            // Son çare olarak fallback'i denerror('Tüm API uç noktaları başarısız');
+            try {
+              console.log('Fallback API deneniyor...');
+              response = await this.$api.get('/api/modules/fallback');
+              console.log('Fallback API yanıtı:', response.data);les = response.data;
+            } catch (fallbackError) {
+              console.warn('Fallback API de çalışmadı:', fallbackError); // Eğer veri boşsa
+              // Son çare olarak varsayılan verileri kullan  if (!this.modules || this.modules.length === 0) {
+              throw new Error('Tüm API uç noktaları başarısız');      console.warn('API yanıt verdi ancak modül verisi yok, varsayılan modülleri kullanıyoruz.');
+            }his.getFallbackModules();
+          }
+        }(error) {
+        onsole.error('Modüller yüklenirken hata oluştu:', error);
+        this.modules = response.data;odüller yüklenemedi. Sunucu ile bağlantı kurulamıyor olabilir.';
+        lbackModules();
         // Eğer veri boşsa
-        if (!this.modules || this.modules.length === 0) {
+        if (!this.modules || this.modules.length === 0) {lse;
           console.warn('API yanıt verdi ancak modül verisi yok, varsayılan modülleri kullanıyoruz.');
           this.modules = this.getFallbackModules();
         }
-      } catch (error) {
-        console.error('Modüller yüklenirken hata oluştu:', error);
+      } catch (error) {llbackModules() {
+        console.error('Modüller yüklenirken hata oluştu:', error);sı yoksa gösterilecek varsayılan modüller
         this.error = 'Modüller yüklenemedi. Sunucu ile bağlantı kurulamıyor olabilir.';
         this.modules = this.getFallbackModules();
       } finally {
-        this.loading = false;
-      }
+        this.loading = false;ek Sistem',
+      }el sistem bileşenleri ve gösterge paneli',
     },
-    
-    getFallbackModules() {
+    isCore: true,
+    getFallbackModules() { version: '1.0.0'
       // Sunucu bağlantısı yoksa gösterilecek varsayılan modüller
       return [
         {
-          code: 'core',
-          name: 'Çekirdek Sistem',
+          code: 'core', Yönetimi',
+          name: 'Çekirdek Sistem',Kullanıcı hesapları ve yetkilendirme',
           description: 'Temel sistem bileşenleri ve gösterge paneli',
           isActive: true,
-          isCore: true,
-          version: '1.0.0'
-        },
-        {
+          isCore: true, version: '1.0.0',
+          version: '1.0.0'  dependencies: ['core']
+        },  },
+        {    {
           code: 'users',
-          name: 'Kullanıcı Yönetimi',
-          description: 'Kullanıcı hesapları ve yetkilendirme',
+          name: 'Kullanıcı Yönetimi',ame: 'Stok Yönetimi',
+          description: 'Kullanıcı hesapları ve yetkilendirme',nter takibi ve stok hareketleri',
           isActive: true,
-          isCore: true,
+          isCore: true,  isCore: false,
           version: '1.0.0',
-          dependencies: ['core']
+          dependencies: ['core']['core']
         },
         {
           code: 'inventory',
           name: 'Stok Yönetimi',
           description: 'Envanter takibi ve stok hareketleri',
           isActive: false,
-          isCore: false,
-          version: '1.0.0',
+          isCore: false,ding = true;
+          version: '1.0.0', await this.$api.post(`/api/modules/${moduleId}/enable`);
           dependencies: ['core']
-        }
+        }success) {
       ];
-    },
-    
-    async enableModule(moduleId) {
+    },ype: 'success',
+       title: 'Başarılı',
+    async enableModule(moduleId) {nse.data.message || `Modül etkinleştirilmek üzere işaretlendi.`
       try {
-        this.loading = true;
-        const response = await this.$api.post(`/api/modules/${moduleId}/enable`);
-        
-        if (response.data.success) {
-          this.$notify({
+        this.loading = true;tesini güncelle
+        // Önce geçici API'yi denechModules();
+        let response;
+        try {
+          response = await this.$api.post(`/api/temp-modules/${moduleId}/enable`); type: 'error',
+        } catch (tempApiError) {: 'Hata',
+          // Geçici API çalışmazsa normal API'yi deneta.message || 'Modül etkinleştirilemedi.'
+          response = await this.$api.post(`/api/modules/${moduleId}/enable`);   });
+        }  }
+          } catch (error) {
+        if (response.data.success) {eştirme hatası:', error);
+          this.$notify({s.$notify({
             type: 'success',
             title: 'Başarılı',
-            text: response.data.message || `Modül etkinleştirilmek üzere işaretlendi.`
+            text: response.data.message || `Modül etkinleştirilmek üzere işaretlendi.`  text: 'Modül etkinleştirilemedi. Sunucu ile bağlantı hatası.'
           });
           // Modül listesini güncelle
-          await this.fetchModules();
+          await this.fetchModules();;
         } else {
           this.$notify({
             type: 'error',
             title: 'Hata',
             text: response.data.message || 'Modül etkinleştirilemedi.'
-          });
-        }
+          });ding = true;
+        } await this.$api.post(`/api/modules/${moduleId}/disable`);
       } catch (error) {
-        console.error('Modül etkinleştirme hatası:', error);
+        console.error('Modül etkinleştirme hatası:', error);success) {
         this.$notify({
-          type: 'error',
-          title: 'Hata',
-          text: 'Modül etkinleştirilemedi. Sunucu ile bağlantı hatası.'
+          type: 'error',ype: 'success',
+          title: 'Hata',   title: 'Başarılı',
+          text: 'Modül etkinleştirilemedi. Sunucu ile bağlantı hatası.'nse.data.message || `Modül devre dışı bırakılmak üzere işaretlendi.`
         });
-      } finally {
-        this.loading = false;
+      } finally {tesini güncelle
+        this.loading = false;chModules();
       }
     },
-    
-    async disableModule(moduleId) {
-      try {
-        this.loading = true;
-        const response = await this.$api.post(`/api/modules/${moduleId}/disable`);
-        
-        if (response.data.success) {
-          this.$notify({
-            type: 'success',
-            title: 'Başarılı',
-            text: response.data.message || `Modül devre dışı bırakılmak üzere işaretlendi.`
+     type: 'error',
+    async disableModule(moduleId) {: 'Hata',
+      try {ta.message || 'Modül devre dışı bırakılamadı.'
+        this.loading = true;   });
+        const response = await this.$api.post(`/api/modules/${moduleId}/disable`);   }
+           } catch (error) {
+        if (response.data.success) {      console.error('Modül devre dışı bırakma hatası:', error);
+          this.$notify({his.$notify({
+            type: 'success',          type: 'error',
+            title: 'Başarılı',e: 'Hata',
+            text: response.data.message || `Modül devre dışı bırakılmak üzere işaretlendi.` 'Modül devre dışı bırakılamadı. Sunucu ile bağlantı hatası.'
           });
-          // Modül listesini güncelle
-          await this.fetchModules();
+          // Modül listesini güncelle     } finally {
+          await this.fetchModules();        this.loading = false;
         } else {
           this.$notify({
             type: 'error',
@@ -189,150 +216,161 @@ export default {
         console.error('Modül devre dışı bırakma hatası:', error);
         this.$notify({
           type: 'error',
-          title: 'Hata',
+          title: 'Hata',rror-container {
           text: 'Modül devre dışı bırakılamadı. Sunucu ile bağlantı hatası.'
-        });
+        });lumn;
       } finally {
-        this.loading = false;
-      }
-    }
-  }
+        this.loading = false;nt: center;
+      };
+    };
+  }px;
 };
 </script>
 
 <style scoped>
-.modules-list {
+.modules-list {px;
   padding: 20px;
-}
+}-color: #2196f3;
 
-.loading, .error-container {
-  display: flex;
-  flex-direction: column;
+.loading, .error-container { border: none;
+  display: flex;  border-radius: 4px;
+  flex-direction: column;ter;
   align-items: center;
   justify-content: center;
   padding: 40px;
   background: #f9f9f9;
-  border-radius: 8px;
-  margin: 20px 0;
+  border-radius: 8px; display: grid;
+  margin: 20px 0;  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
-
+px;
 .retry-btn {
   margin-top: 15px;
-  padding: 8px 16px;
-  background-color: #2196f3;
-  color: white;
-  border: none;
-  border-radius: 4px;
+  padding: 8px 16px;module-card {
+  background-color: #2196f3;  border: 1px solid #e0e0e0;
+  color: white;x;
+  border: none;6px;
+  border-radius: 4px;4px rgba(0, 0, 0, 0.05);
   cursor: pointer;
   font-weight: bold;
-}
+}.module-header {
 
-.modules-container {
-  display: grid;
+.modules-container { center;
+  display: grid;x;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
-  margin-top: 20px;
+  margin-top: 20px;.module-header h2 {
 }
-
+;
 .module-card {
   border: 1px solid #e0e0e0;
   border-radius: 8px;
-  padding: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 16px;module-version {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);  color: #666;
 }
 
 .module-header {
   display: flex;
-  align-items: center;
+  align-items: center;.module-status {
   margin-bottom: 10px;
 }
-
-.module-header h2 {
-  margin: 0;
+em;
+.module-header h2 { font-weight: bold;
+  margin: 0;}
   font-size: 1.2rem;
-  flex-grow: 1;
-}
-
-.module-version {
+  flex-grow: 1;abled {
+}olor: #e6f7e6;
+ color: #2e7d32;
+.module-version {}
   color: #666;
-  font-size: 0.8rem;
-  margin: 0 10px;
+  font-size: 0.8rem;sabled {
+  margin: 0 10px;#f7e6e6;
+} color: #c62828;
 }
-
 .module-status {
-  padding: 4px 8px;
+  padding: 4px 8px;ion {
   border-radius: 4px;
   font-size: 0.8rem;
   font-weight: bold;
 }
 
-.module-status.enabled {
+.module-status.enabled {;
   background-color: #e6f7e6;
   color: #2e7d32;
 }
-
+ies h4 {
 .module-status.disabled {
-  background-color: #f7e6e6;
+  background-color: #f7e6e6;rem;
   color: #c62828;
 }
 
-.module-description {
+.module-description {dependencies ul {
   margin: 10px 0;
-  color: #555;
+  color: #555; 20px;
 }
 
 .module-dependencies {
-  margin: 10px 0;
-  font-size: 0.9rem;
-}
+  margin: 10px 0; margin-top: 15px;
+  font-size: 0.9rem;  display: flex;
+}tent: flex-end;
 
 .module-dependencies h4 {
-  margin: 5px 0;
-  font-size: 0.9rem;
-  color: #555;
+  margin: 5px 0;utton {
+  font-size: 0.9rem;  padding: 8px 16px;
+  color: #555;;
 }
-
-.module-dependencies ul {
-  margin: 5px 0;
+er;
+.module-dependencies ul { font-weight: bold;
+  margin: 5px 0;}
   padding-left: 20px;
 }
-
+olor: #2196f3;
 .module-actions {
   margin-top: 15px;
   display: flex;
   justify-content: flex-end;
-}
-
+} background-color: #f44336;
+  color: white;
 button {
   padding: 8px 16px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-weight: bold;
-}
-
-.enable-btn {
+  font-weight: bold; padding: 4px 8px;
+}  border-radius: 4px;
+size: 0.8rem;
+.enable-btn { bold;
   background-color: #2196f3;
   color: white;
-}
-
-.disable-btn {
-  background-color: #f44336;
-  color: white;
-}
-
-.core-badge {
-  background-color: #e0e0e0;
-  color: #555;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: bold;
-}
-
-.modules-help {
+}-help {
   margin-top: 30px;
-  padding: 15px;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</style>}  font-style: italic;  color: #666;.note {}  border-radius: 8px;  background-color: #f5f5f5;  padding: 15px;  margin-top: 30px;.modules-help {}  font-weight: bold;  font-size: 0.8rem;  border-radius: 4px;  padding: 4px 8px;  color: #555;  background-color: #e0e0e0;.core-badge {}  color: white;  background-color: #f44336;.disable-btn {  padding: 15px;
   background-color: #f5f5f5;
   border-radius: 8px;
 }

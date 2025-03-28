@@ -9,6 +9,7 @@ import { UsersService } from './users/users.service';
 import { InventoryModule } from './inventory/inventory.module';
 import { ModulesModule } from './modules/modules.module';
 import { ModulesService } from './modules/modules.service';
+import { TempModulesController } from './temp-modules.controller';
 // Yeni modüller buraya import edilecek
 // import { SalesModule } from './modules/sales/sales.module';
 
@@ -31,31 +32,37 @@ import { ModulesService } from './modules/modules.service';
         synchronize: configService.get<boolean>('DB_SYNCHRONIZE', true),
         autoLoadEntities: true,
       }),
-    }),
-    // Çekirdek modüller
+    }),arma sırasını değiştirelim
+    // Çekirdek modüllere.forRoot(), // Bu modülü önce içe aktaralım
     UsersModule,
     AuthModule,
-    ModulesModule.forRoot(),
+    ModulesModule.forRoot(),UsersModule,
     
     // İsteğe bağlı modüller
     InventoryModule,
-    // Yeni modüller burada aktive edilir
-    // SalesModule,
+    // Yeni modüller burada aktive edilir,
+    // SalesModule,// Yeni modüller burada aktive edilir
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, TempModulesController],
+  providers: [AppService],controllers: [AppController],
 })
 export class AppModule implements OnModuleInit {
-  constructor(
+  constructor(uleInit {
     private usersService: UsersService,
-    private modulesService: ModulesService
-  ) {}
+    private modulesService: ModulesServiceivate usersService: UsersService,
+  ) {}    private modulesService: ModulesService
 
   async onModuleInit() {
     // Admin kullanıcısını seed'leme
-    await this.usersService.seedAdmin();
-    
+    await this.usersService.seedAdmin();try {
+    e
     // Varsayılan modülleri seed'leme
-    await this.modulesService.seedDefaultModules();
+    await this.modulesService.seedDefaultModules();   
+  }     // Varsayılan modülleri seed'leme
+}      await this.modulesService.seedDefaultModules();
+
+    } catch (error) {
+      console.error('Başlatma sırasında hata:', error);
+    }
   }
 }

@@ -22,8 +22,7 @@ export class ModulesModule {
         {
           provide: ModuleManager,
           useFactory: () => {
-            const manager = new ModuleManager();
-            return manager;
+            return new ModuleManager();
           },
         },
       ],

@@ -1,61 +1,79 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards, NotFoundException, ConflictException, Logger } from '@nestjs/common';common';
+import { Controller, Get, Post, Put, Delete, Param, Body, NotFoundException, ConflictException, Logger } from '@nestjs/common';
 import { ModuleManager } from './module-manager';
 import { ModulesService } from './modules.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
 import { CreateModuleDto, UpdateModuleDto, ToggleModuleDto } from './dto/module.dto';
 
-// Guard'ları kaldırın - geliştirme sırasında sorunları gidermek için
-// @UseGuards(JwtAuthGuard, RolesGuard)
-@Controller('api/modules')Logger(ModulesController.name);
+@Controller('api/modules')
 export class ModulesController {
+  private readonly logger = new Logger(ModulesController.name);
+
   constructor(
     private readonly moduleManager: ModuleManager,
-    private readonly modulesService: ModulesServiceivate readonly modulesService: ModulesService
-  ) {}  ) {
-.logger.log('ModulesController initialized');
-  // @Roles('admin') - bu decorator'ü de kaldırın veya yorumunu alın
+    private readonly modulesService: ModulesService
+  ) {
+    this.logger.log('ModulesController initialized');
+  }
+
   @Get()
   async getAllModules() {
-    try {uard)
+    this.logger.log('GET /api/modules isteği alındı');
+    try {
       // Veritabanından modülleri al
       const dbModules = await this.modulesService.findAll();
-      // Dosya tabanlı modül bilgilerini de al
-      const fileModules = this.moduleManager.getAllModules();y {
+      this.logger.log(`DB modülleri: ${dbModules.length}`);
       
-      // Veritabanı modüllerini döndür, dosya modüllerini ekle (eğer DB'de yoksa)Modules = await this.modulesService.findAll();
-      return [(`DB modülleri: ${dbModules.length}`);
+      // Dosya tabanlı modül bilgilerini de al
+      const fileModules = this.moduleManager.getAllModules();
+      this.logger.log(`Dosya modülleri: ${fileModules.length}`);
+      
+      // Veritabanı modüllerini döndür, dosya modüllerini ekle (eğer DB'de yoksa)
+      const result = [
         ...dbModules,
-        ...fileModules.filter(fm => !dbModules.some(dm => dm.code === fm.name))modül bilgilerini de al
-          .map(fm => ({this.moduleManager.getAllModules();
-            code: fm.name,ya modülleri: ${fileModules.length}`);
+        ...fileModules.filter(fm => !dbModules.some(dm => dm.code === fm.name))
+          .map(fm => ({
+            code: fm.name,
             name: fm.name,
-            description: fm.description,döndür, dosya modüllerini ekle (eğer DB'de yoksa)
+            description: fm.description,
             version: fm.version,
             isActive: fm.isEnabled,
-            dependencies: fm.dependenciesleModules.filter(fm => !dbModules.some(dm => dm.code === fm.name))
-          }))  .map(fm => ({
-      ];name,
+            dependencies: fm.dependencies
+          }))
+      ];
+      
+      this.logger.log(`Toplam ${result.length} modül döndürülüyor`);
+      return result;
     } catch (error) {
-      console.error('Modüller alınırken hata:', error);,
-      // Hata durumunda boş dizi döndürion: fm.version,
-      return [];       isActive: fm.isEnabled,
-    }         dependencies: fm.dependencies
-  }          }))
+      this.logger.error('Modüller alınırken hata:', error);
+      // Hata durumunda varsayılan modülleri döndür
+      return [
+        {
+          code: 'core',
+          name: 'Çekirdek Sistem',
+          description: 'Temel sistem fonksiyonları',
+          version: '1.0.0',
+          isActive: true,
+          isCore: true
+        }
+      ];
+    }
+  }
 
   @Get('active')
-  async getActiveModules() {s.logger.log(`Toplam ${result.length} modül döndürülüyor`);
+  async getActiveModules() {
+    this.logger.log('GET /api/modules/active isteği alındı');
     try {
       // Aktif veritabanı modüllerini al
-      const dbModules = await this.modulesService.findActive();lınırken hata:', error);
-      // Aktif dosya modüllerini al
-      const fileModules = this.moduleManager.getEnabledModules();return [
+      const dbModules = await this.modulesService.findActive();
+      this.logger.log(`Aktif DB modülleri: ${dbModules.length}`);
       
-      // Aktif modülleri döndür: 'core',
-      return [rdek Sistem',
+      // Aktif dosya modüllerini al
+      const fileModules = this.moduleManager.getEnabledModules();
+      this.logger.log(`Aktif dosya modülleri: ${fileModules.length}`);
+      
+      // Aktif modülleri döndür
+      const result = [
         ...dbModules,
-        ...fileModules.filter(fm => !dbModules.some(dm => dm.code === fm.name)).0',
+        ...fileModules.filter(fm => !dbModules.some(dm => dm.code === fm.name))
           .map(fm => ({
             code: fm.name,
             name: fm.name,
@@ -63,43 +81,46 @@ export class ModulesController {
             version: fm.version,
             isActive: true,
             dependencies: fm.dependencies
-          }))active')
-      ];les() {
+          }))
+      ];
+      
+      this.logger.log(`Toplam ${result.length} aktif modül döndürülüyor`);
+      return result;
     } catch (error) {
-      console.error('Aktif modüller alınırken hata:', error);
-      // Hata durumunda temel modülleri döndür veritabanı modüllerini al
-      return [st dbModules = await this.modulesService.findActive();
-        {Aktif DB modülleri: ${dbModules.length}`);
+      this.logger.error('Aktif modüller alınırken hata:', error);
+      // Hata durumunda temel modülleri döndür
+      return [
+        {
           code: 'core',
           name: 'Çekirdek Sistem',
-          description: 'Temel sistem fonksiyonları',his.moduleManager.getEnabledModules();
-          version: '1.0.0',tif dosya modülleri: ${fileModules.length}`);
+          description: 'Temel sistem fonksiyonları',
+          version: '1.0.0',
           isActive: true,
-          isCore: trueAktif modülleri döndür
-        }nst result = [
-      ];   ...dbModules,
-    }     ...fileModules.filter(fm => !dbModules.some(dm => dm.code === fm.name))
-  }          .map(fm => ({
-name,
-  @Post(':id/enable') fm.name,
+          isCore: true
+        }
+      ];
+    }
+  }
+
+  @Post(':id/enable')
   async enableModule(@Param('id') id: string) {
-    try {   version: fm.version,
+    try {
       // Dosya modülü mü yoksa DB modülü mü kontrol et
       const isUuid = id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
-          }))
+      
       if (isUuid) {
         // UUID formatındaysa, DB modülü
-        await this.modulesService.toggle(id, { isActive: true });ülüyor`);
-        return {ult;
+        await this.modulesService.toggle(id, { isActive: true });
+        return {
           success: true,
-          message: `Modül etkinleştirildi.`nırken hata:', error);
-        };ata durumunda temel modülleri döndür
+          message: `Modül etkinleştirildi.`
+        };
       } else {
         // Değilse, dosya modülü veya kod ile arama
-        try {e: 'core',
+        try {
           const module = await this.modulesService.findByCode(id);
           await this.modulesService.toggle(module.id, { isActive: true });
-          return { '1.0.0',
+          return {
             success: true,
             message: `"${module.name}" modülü etkinleştirildi.`
           };
@@ -108,109 +129,86 @@ name,
           return {
             success: true,
             message: `"${id}" modülü etkinleştirilmek üzere işaretlendi. .env dosyasını güncelleyin.`
-          };min')
-        }nableModule(@Param('id') id: string) {
-      } {
-    } catch (error) { mü yoksa DB modülü mü kontrol et
-      console.error('Modül etkinleştirme hatası:', error);-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+          };
+        }
+      }
+    } catch (error) {
+      this.logger.error('Modül etkinleştirme hatası:', error);
       if (error instanceof ConflictException) {
-        return {) {
-          success: false,aysa, DB modülü
-          message: error.messagee.toggle(id, { isActive: true });
-        };turn {
-      }   success: true,
-      return {age: `Modül etkinleştirildi.`
+        return {
+          success: false,
+          message: error.message
+        };
+      }
+      return {
         success: false,
         message: `Modül etkinleştirilemedi: ${error.message}`
-      };// Değilse, dosya modülü veya kod ile arama
-    }   try {
-  }       const module = await this.modulesService.findByCode(id);
-          await this.modulesService.toggle(module.id, { isActive: true });
+      };
+    }
+  }
+
   @Post(':id/disable')
-  async disableModule(@Param('id') id: string) {ss: true,
-    try {kinleştirildi.`
-      // Dosya modülü mü yoksa DB modülü mü kontrol et };
+  async disableModule(@Param('id') id: string) {
+    try {
+      // Dosya modülü mü yoksa DB modülü mü kontrol et
       const isUuid = id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
       
-      if (isUuid) {    return {
-        // UUID formatındaysa, DB modülü: true,
-        const module = await this.modulesService.findOne(id);inleştirilmek üzere işaretlendi. .env dosyasını güncelleyin.`
+      if (isUuid) {
+        // UUID formatındaysa, DB modülü
+        const module = await this.modulesService.findOne(id);
         if (module.isCore) {
           return {
             success: false,
             message: `"${module.name}" çekirdek bir modüldür ve devre dışı bırakılamaz.`
           };
-        }ror instanceof ConflictException) {
-        await this.modulesService.toggle(id, { isActive: false });eturn {
+        }
+        await this.modulesService.toggle(id, { isActive: false });
         return {
-          success: true,e: error.message
+          success: true,
           message: `Modül devre dışı bırakıldı.`
         };
-      } else {rn {
-        // Değilse, dosya modülü veya kod ile aramas: false,
-        try {.message}`
+      } else {
+        // Değilse, dosya modülü veya kod ile arama
+        try {
           const module = await this.modulesService.findByCode(id);
           if (module.isCore) {
             return {
               success: false,
               message: `"${module.name}" çekirdek bir modüldür ve devre dışı bırakılamaz.`
             };
-          }eModule(@Param('id') id: string) {
+          }
           await this.modulesService.toggle(module.id, { isActive: false });
           return {
-            success: true, = id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+            success: true,
             message: `"${module.name}" modülü devre dışı bırakıldı.`
           };
-        } catch (error) {UID formatındaysa, DB modülü
-          // Dosya tabanlı modül - .env değişikliği gerekliait this.modulesService.findOne(id);
+        } catch (error) {
+          // Dosya tabanlı modül - .env değişikliği gerekli
           return {
             success: true,
-            message: `"${id}" modülü devre dışı bırakılmak üzere işaretlendi. .env dosyasını güncelleyin.`,
+            message: `"${id}" modülü devre dışı bırakılmak üzere işaretlendi. .env dosyasını güncelleyin.`
           };
         }
       }
-    } catch (error) { await this.modulesService.toggle(id, { isActive: false });
-      console.error('Modül devre dışı bırakma hatası:', error);
+    } catch (error) {
+      this.logger.error('Modül devre dışı bırakma hatası:', error);
       return {
-        success: false,age: `Modül devre dışı bırakıldı.`
+        success: false,
         message: `Modül devre dışı bırakılamadı: ${error.message}`
       };
-    }// Değilse, dosya modülü veya kod ile arama
-  }   try {
-         const module = await this.modulesService.findByCode(id);
-  @Get(':id')        if (module.isCore) {
-  async getModule(@Param('id') id: string) {eturn {
-    try {cess: false,
-      return await this.modulesService.findOne(id);irdek bir modüldür ve devre dışı bırakılamaz.`
-    } catch (error) {   };
-      if (error instanceof NotFoundException) {
-        throw error;modulesService.toggle(module.id, { isActive: false });
-      }
-      // Eğer UUID formatında değilse, koda göre arama yap true,
-      try {     message: `"${module.name}" modülü devre dışı bırakıldı.`
-        return await this.modulesService.findByCode(id);
-      } catch (innerError) {atch (error) {
-        throw new NotFoundException(`Modül bulunamadı: ${id}`);kli
-      }
     }
-  }     message: `"${id}" modülü devre dışı bırakılmak üzere işaretlendi. .env dosyasını güncelleyin.`
-       };
-  @Post()     }
-  async createModule(@Body() createModuleDto: CreateModuleDto) {    }
-    return this.modulesService.create(createModuleDto);ch (error) {
-  }or('Modül devre dışı bırakma hatası:', error);
-  
-  @Put(':id')
-  async updateModule(@Param('id') id: string, @Body() updateModuleDto: UpdateModuleDto) {     message: `Modül devre dışı bırakılamadı: ${error.message}`
-    return this.modulesService.update(id, updateModuleDto);    };
   }
   
-  @Delete(':id')
-  async deleteModule(@Param('id') id: string) {
-    await this.modulesService.remove(id);Roles('admin')
-    return { success: true, message: 'Modül başarıyla silindi' };async getModule(@Param('id') id: string) {
-  }
-}t this.modulesService.findOne(id);
+  @Get(':id')
+  async getModule(@Param('id') id: string) {
+    try {
+      return await this.modulesService.findOne(id);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      // Eğer UUID formatında değilse, koda göre arama yap
+      try {
         return await this.modulesService.findByCode(id);
       } catch (innerError) {
         throw new NotFoundException(`Modül bulunamadı: ${id}`);
@@ -219,19 +217,16 @@ name,
   }
   
   @Post()
-  @Roles('admin')
   async createModule(@Body() createModuleDto: CreateModuleDto) {
     return this.modulesService.create(createModuleDto);
   }
   
   @Put(':id')
-  @Roles('admin')
   async updateModule(@Param('id') id: string, @Body() updateModuleDto: UpdateModuleDto) {
     return this.modulesService.update(id, updateModuleDto);
   }
   
   @Delete(':id')
-  @Roles('admin')
   async deleteModule(@Param('id') id: string) {
     await this.modulesService.remove(id);
     return { success: true, message: 'Modül başarıyla silindi' };

@@ -36,13 +36,14 @@ module.exports = defineConfig({
       '/api': {
         target: BACKEND_URL,
         changeOrigin: true,
-        pathRewrite: { '^/api': '/api' },
+        secure: false,
         logLevel: 'debug',
         onProxyReq(proxyReq, req, res) {
           console.log(`[Proxy] ${req.method} ${req.url} -> ${BACKEND_URL}${proxyReq.path}`);
         },
         onError(err, req, res) {
           console.error(`[Proxy Error] ${req.method} ${req.url}: ${err.message}`);
+          
           // Proxy hatası durumunda fallback yanıt
           if (req.url.includes('/api/modules')) {
             res.writeHead(200, { 'Content-Type': 'application/json' });
