@@ -68,34 +68,9 @@ services:
     networks:
       - flax-network
 
-  # Redis for Caching
-  redis:
-    image: redis:alpine
-    volumes:
-      - redis_data:/data
-    ports:
-      - "6379:6379"
-    restart: unless-stopped
-
-  # pgAdmin for Advanced Database Management (optional)
-  pgadmin:
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@flax-erp.com
-      PGADMIN_DEFAULT_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
-    ports:
-      - "5050:80"
-    depends_on:
-      - db
-    restart: unless-stopped
-
 networks:
   flax-network:
     driver: bridge
 
 volumes:
   postgres_data:
-  redis_data:
-  pgadmin_data:

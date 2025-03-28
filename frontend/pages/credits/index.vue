@@ -344,114 +344,106 @@ export default {
           price: 100,
           features: [
             'Tek seferlik modül alımı için uygun',
-            'Anında kredi aktar',
-            'Temel destek'
-          ],
-          isBestValue: false
+            'Anında kredi aktarımı',
+            '1 ay geçerlilik süresi'
+          ]
         },
         {
           id: 2,
-          name: 'İşletme Paketi',
+          name: 'Standart Paket',
           credits: 500,
           price: 450,
+          isBestValue: true,
           features: [
-            '50 kredi bonus (%10 indirim)',
-            'Öncelikli destek',
-            'İşletme modülleri için ideal'
-          ],
-          isBestValue: true
+            '%10 indirimli paket',
+            'Çoklu modül aktivasyonu için uygun',
+            'Anında kredi aktarımı',
+            '3 ay geçerlilik süresi'
+          ]
         },
         {
           id: 3,
-          name: 'Kurumsal Paket',
+          name: 'Premium Paket',
           credits: 1000,
           price: 850,
           features: [
-            '150 kredi bonus (%15 indirim)',
-            'VIP destek',
-            'Tüm modüller için ideal'
-          ],
-          isBestValue: false
+            '%15 indirimli paket',
+            'Tüm modülleri kullanmak için ideal',
+            'Anında kredi aktarımı',
+            '6 ay geçerlilik süresi',
+            '7/24 öncelikli destek'
+          ]
         }
       ],
       recentTransactions: [
         {
           type: 'credit_purchase',
-          description: 'Kredi Satın Alma',
+          description: 'Kredi satın alma',
           amount: 100,
-          date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) // 3 gün önce
+          date: '2023-10-15'
         },
         {
           type: 'module_purchase',
-          description: 'Finans Modülü Satın Alma',
-          amount: 80,
-          date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) // 2 gün önce
+          description: 'Finans Modülü satın alma',
+          amount: 100,
+          date: '2023-10-15'
         },
         {
           type: 'credit_purchase',
-          description: 'Kredi Satın Alma',
-          amount: 50,
-          date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) // 1 gün önce
+          description: 'Kredi satın alma',
+          amount: 250,
+          date: '2023-09-22'
+        },
+        {
+          type: 'module_purchase',
+          description: 'Stok Modülü satın alma',
+          amount: 80,
+          date: '2023-09-20'
         }
       ],
       monthOptions: [
-        { text: '01', value: '01' },
-        { text: '02', value: '02' },
-        { text: '03', value: '03' },
-        { text: '04', value: '04' },
-        { text: '05', value: '05' },
-        { text: '06', value: '06' },
-        { text: '07', value: '07' },
-        { text: '08', value: '08' },
-        { text: '09', value: '09' },
-        { text: '10', value: '10' },
-        { text: '11', value: '11' },
-        { text: '12', value: '12' }
+        '01', '02', '03', '04', '05', '06', 
+        '07', '08', '09', '10', '11', '12'
       ],
       yearOptions: []
     }
   },
   created() {
-    // Yıl seçeneklerini oluştur (sonraki 10 yıl)
+    // Son Kullanma Yılı seçeneklerini oluştur (şu anki yıl + 10 yıl)
     const currentYear = new Date().getFullYear();
     for (let i = 0; i < 10; i++) {
-      this.yearOptions.push({
-        text: String(currentYear + i),
-        value: String(currentYear + i)
-      });
+      this.yearOptions.push((currentYear + i).toString());
     }
   },
   async mounted() {
     try {
-      // Kullanıcı kredilerini getir
-      const response = await this.$axios.get('/user/credits');
-      this.userCredits = response.data.amount;
+      // Kullanıcı kredisini API'den al (simülasyon için sabit değer kullanıyoruz)
+      // const response = await this.$axios.get('/credits')
+      // this.userCredits = response.data.amount;
       
-      // Son işlemleri getir
-      // const transactionsResponse = await this.$axios.get('/user/transactions/recent');
+      // Kullanıcı işlem geçmişini al (simülasyon için sabit değer kullanıyoruz)
+      // const transactionsResponse = await this.$axios.get('/credits/transactions')
       // this.recentTransactions = transactionsResponse.data;
     } catch (error) {
-      console.error('Veri alınırken hata oluştu:', error);
+      console.error('Kredi bilgileri alınırken hata oluştu:', error);
     }
   },
   methods: {
-    formatCurrency(value) {
-      return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(value);
+    formatCurrency(amount) {
+      return new Intl.NumberFormat('tr-TR', {
+        style: 'currency',
+        currency: 'TRY'
+      }).format(amount);
     },
-    formatDate(date) {
-      if (!date) return '';
-      return new Date(date).toLocaleDateString('tr-TR');
+    formatDate(dateString) {
+      if (!dateString) return '-';
+      const date = new Date(dateString);
+      return date.toLocaleDateString('tr-TR');
     },
     calculateCustomPackage() {
-      // 1 kredi = 1 TL olarak hesaplanıyor
+      // Basit bir hesaplama: 1 kredi = 1 TL
+      // Gerçek uygulamada daha karmaşık bir fiyatlandırma olabilir
       this.customPackagePrice = this.customAmount;
-      
-      // İndirimli fiyatlandırma
-      if (this.customAmount >= 1000) {
-        this.customPackagePrice = this.customAmount * 0.85; // %15 indirim
-      } else if (this.customAmount >= 500) {
-        this.customPackagePrice = this.customAmount * 0.9; // %10 indirim
-      }
     },
     selectPackage(pkg) {
       this.selectedPackage = pkg;
@@ -462,54 +454,56 @@ export default {
       this.paymentDialog = true;
     },
     async processPayment() {
-      if (this.paymentTab === 0) { // Kredi kartı ödeme
-        if (!this.$refs.creditCardForm.validate()) {
-          return;
-        }
+      if (this.paymentTab === 0 && !this.$refs.creditCardForm.validate()) {
+        return;
+      }
+      
+      this.processingPayment = true;
+      
+      try {
+        // API çağrısı yapılır (simülasyon için)
+        // await this.$axios.post('/credits/purchase', {
+        //   amount: this.selectedPackage ? this.selectedPackage.credits : this.customAmount,
+        //   paymentMethod: this.paymentTab === 0 ? 'credit_card' : 'bank_transfer',
+        //   paymentDetails: this.paymentTab === 0 ? this.paymentDetails : null
+        // });
         
-        this.processingPayment = true;
+        // Simülasyon için timeout
+        await new Promise(resolve => setTimeout(resolve, 1500));
         
-        try {
-          // API isteği yapılabilir (simüle ediliyor)
-          // await this.$axios.post('/payments/credit-card', {
-          //   packageId: this.selectedPackage ? this.selectedPackage.id : null,
-          //   customAmount: !this.selectedPackage ? this.customAmount : null,
-          //   cardDetails: this.paymentDetails
-          // });
-          
-          // İşlem simülasyonu
-          await new Promise(resolve => setTimeout(resolve, 2000));
-          
-          this.paymentDialog = false;
-          this.successDialog = true;
-          
-          // Kredi bakiyesini güncelle (gerçek uygulamada API'den yapılır)
-          const addedCredits = this.selectedPackage ? this.selectedPackage.credits : this.customAmount;
-          this.userCredits += addedCredits;
-          
-          // Son işlemlere ekle
-          this.recentTransactions.unshift({
-            type: 'credit_purchase',
-            description: 'Kredi Satın Alma',
-            amount: addedCredits,
-            date: new Date()
-          });
-        } catch (error) {
-          console.error('Ödeme işlemi sırasında hata oluştu:', error);
-          alert('Ödeme işlemi sırasında bir hata oluştu. Lütfen tekrar deneyin.');
-        } finally {
-          this.processingPayment = false;
-        }
-      } else { // Havale/EFT için sadece bilgilendirme mesajı göster
-        alert('Havale/EFT bilgileriniz kaydedildi. Ödemeniz onaylandıktan sonra kredileriniz hesabınıza tanımlanacaktır.');
         this.paymentDialog = false;
+        this.successDialog = true;
+        
+        // Gerçek uygulamada API'den güncel kredi bilgisini alırdık
+        // Şimdilik manuel güncelleme yapıyoruz
+        // const response = await this.$axios.get('/credits');
+        // this.userCredits = response.data.amount;
+      } catch (error) {
+        console.error('Ödeme işlemi sırasında hata oluştu:', error);
+        // Kullanıcıya hata mesajı göster
+        alert('Ödeme işlemi sırasında bir hata oluştu. Lütfen tekrar deneyin.');
+      } finally {
+        this.processingPayment = false;
       }
     },
     confirmSuccess() {
-      this.successDialog = false;
-      this.selectedPackage = null;
+      // Başarılı ödeme sonrası kredi miktarını güncelle (simülasyon)
+      const creditAmount = this.selectedPackage ? this.selectedPackage.credits : this.customAmount;
+      this.userCredits += creditAmount;
       
-      // Form sıfırlama
+      // Yeni işlemi işlem geçmişine ekle
+      this.recentTransactions.unshift({
+        type: 'credit_purchase',
+        description: 'Kredi satın alma',
+        amount: creditAmount,
+        date: new Date().toISOString().split('T')[0]
+      });
+      
+      this.successDialog = false;
+      
+      // Form ve seçimleri sıfırla
+      this.selectedPackage = null;
+      this.paymentTab = 0;
       this.paymentDetails = {
         cardName: '',
         cardNumber: '',
@@ -517,7 +511,6 @@ export default {
         expiryYear: '',
         cvv: ''
       };
-      this.paymentTab = 0;
     }
   },
   head() {
@@ -530,23 +523,29 @@ export default {
 
 <style scoped>
 .package-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
-  transition: transform 0.2s;
+  overflow: hidden;
 }
+
 .package-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
 }
+
 .best-value {
   border: 2px solid #1976D2 !important;
 }
+
 .best-value-badge {
   position: absolute;
-  top: 0;
+  top: 10px;
   right: 0;
   background-color: #1976D2;
   color: white;
   padding: 5px 10px;
   font-size: 12px;
-  border-bottom-left-radius: 4px;
+  transform: rotate(0deg);
+  z-index: 1;
 }
 </style>
