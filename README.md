@@ -1,72 +1,86 @@
 # Flax-ERP Projesi
 
-Flax-ERP, modüler bir kurumsal kaynak planlama sistemidir. Web tabanlı platform üzerinden üyelik sistemi ile çeşitli modüller sağlar.
+Modüler ERP sistemi. Kredi tabanlı modül aktivasyonu ile istediğiniz kadar modül kullanabilirsiniz.
 
-## Özellikler
+## Çalıştırma Talimatları
 
-- Şık ve modern kullanıcı arayüzü
-- Modüler yapı ile genişletilebilir sistem
-- Kredi tabanlı modül satın alma sistemi
-- PostgreSQL veritabanı altyapısı
-- Sağ tarafta yer alan sidebar navigasyon
-- Kullanıcı dostu dashboard
+### Gereksinimler
 
-## Teknolojiler
+- Docker
+- Docker Compose
 
-- **Frontend**: Nuxt.js, Vue.js
-- **Backend**: Node.js, NestJS
-- **Veritabanı**: PostgreSQL
-- **Konteynerizasyon**: Docker, Docker Compose
+### Kurulum
 
-## Başlangıç
-
-Projeyi başlatmak için aşağıdaki adımları izleyin:
-
-1. Projeyi klonlayın:
-   ```
-   git clone https://github.com/kullanici/flax-erp.git
+1. Depoyu klonlayın:
+   ```bash
+   git clone https://github.com/username/flax-erp.git
    cd flax-erp
    ```
 
-2. Geliştirme ortamını kurun:
-   ```
+2. Başlatma scriptine çalıştırma izni verin:
+   ```bash
    chmod +x scripts/start.sh
+   ```
+
+3. Geliştirme ortamını kurun:
+   ```bash
    ./scripts/start.sh setup
    ```
 
-3. Servisleri başlatın:
-   ```
+4. Servisleri başlatın:
+   ```bash
    ./scripts/start.sh start
    ```
 
-4. Tarayıcınızda aşağıdaki URL'lere erişin:
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:3001
-   - Adminer (DB Yönetimi): http://localhost:8080
+### Kullanılabilir Komutlar
 
-## Modüler Yapı
+- `./scripts/start.sh setup` - Geliştirme ortamını kurar
+- `./scripts/start.sh start` - Tüm servisleri başlatır
+- `./scripts/start.sh stop` - Tüm servisleri durdurur
+- `./scripts/start.sh restart` - Tüm servisleri yeniden başlatır
+- `./scripts/start.sh status` - Servislerin durumunu gösterir
+- `./scripts/start.sh logs` - Servislerin loglarını gösterir
 
-Tüm ERP modülleri `modules/` dizini altında geliştirilir. Her modül aşağıdaki bileşenlere sahiptir:
+### Erişim Bilgileri
 
-1. Backend API endpoint'leri
-2. Frontend UI bileşenleri
-3. Veritabanı modelleri
+- Frontend: http://88.218.130.67:3000
+- Backend API: http://88.218.130.67:3001/api
+- API Dokümantasyonu: http://88.218.130.67:3001/api/docs
 
-## Yönetim Betiği
+## Geliştirme Notları
 
-`./scripts/start.sh` betiği ile projeyi yönetebilirsiniz:
+### Node Modülleri
 
-- `setup`: Geliştirme ortamını kurar
-- `start`: Tüm servisleri başlatır
-- `stop`: Tüm servisleri durdurur
-- `restart`: Tüm servisleri yeniden başlatır
-- `status`: Çalışan servislerin durumunu gösterir
-- `logs`: Servis loglarını görüntüler
-- `frontend`: Frontend servisini yeniden başlatır
-- `backend`: Backend servisini yeniden başlatır
-- `db`: Veritabanı servisini yeniden başlatır
-- `shell`: Belirli bir servis için shell açar (örn: `./scripts/start.sh shell backend`)
+Bu proje, `node_modules` klasörlerini Git'e dahil etmez. Projeyi klonladıktan sonra aşağıdaki komutları kullanarak bağımlılıkları yükleyin:
 
-## Sunucu Bilgileri
+```bash
+# Frontend bağımlılıklarını yükle
+cd frontend
+npm install
 
-Canlı sunucumuz: 88.218.130.67
+# Backend bağımlılıklarını yükle
+cd ../backend
+npm install
+```
+
+Alternatif olarak, `./scripts/start.sh setup` komutu tüm bağımlılıkları otomatik olarak yükler.
+
+## Teknoloji Yığını
+
+- **Backend**: NestJS (Node.js + TypeScript)
+- **Frontend**: Nuxt.js + Vue.js + Vuetify
+- **Veritabanı**: PostgreSQL
+- **Deployment**: Docker & Docker Compose
+
+## Modüller
+
+- **Finans Yönetimi**: Fatura, müşteri, ödeme yönetimi
+- **Envanter Yönetimi**: Ürün, kategori, stok takibi
+- **CRM**: Müşteri ilişkileri yönetimi
+- **İK Yönetimi**: Personel takibi
+- **Proje Yönetimi**: Görev, zaman takibi
+- **Raporlama**: İş analitiği ve raporlama
+
+## Lisans
+
+Bu proje özel lisans altında dağıtılmaktadır. Tüm haklar saklıdır.

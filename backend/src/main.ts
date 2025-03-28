@@ -6,37 +6,41 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
-  // CORS yapılandırması
+  // CORS ayarları
   app.enableCors({
-    origin: ['http://localhost:3000', 'https://flax-erp.com'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    origin: [
+      'http://localhost:3000',
+      'http://88.218.130.67:3000',
+      'http://88.218.130.67'
+    ],
     credentials: true,
   });
-  
-  // Validation pipe
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      transform: true,
-      forbidNonWhitelisted: true,
-    }),
-  );
-  
-  // API prefix
+
+  // Global prefix
   app.setGlobalPrefix('api');
-  
-  // Swagger API dokümanı
+
+  // Validasyon pipe
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+    transform: true,
+    forbidNonWhitelisted: true,
+  }));
+
+  // Swagger dokümantasyonu
   const config = new DocumentBuilder()
     .setTitle('Flax-ERP API')
-    .setDescription('Flax-ERP API dokümantasyonu')
+    .setDescription('Flax-ERP sistemi için API dokümantasyonu')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
-  
-  await app.listen(3001);
-  console.log(`Uygulama http://localhost:3001 adresinde çalışıyor`);
-  console.log(`API Dokümantasyonu: http://localhost:3001/api/docs`);
+
+  // Server başlatma
+  const port = process.env.PORT || 3001;
+  const host = process.env.HOST || '0.0.0.0';
+  await app.listen(port, host);
+  console.log(`Flax-ERP API başlatıldı: http://${host}:${port}/api`);
+  console.log(`Swagger Dokümantasyonu: http://${host}:${port}/api/docs`);
 }
 bootstrap();

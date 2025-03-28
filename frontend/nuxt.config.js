@@ -2,14 +2,14 @@ export default {
   // Global page headers
   head: {
     titleTemplate: '%s - Flax ERP',
-    title: 'Flax ERP',
+    title: 'Flax-ERP',
     htmlAttrs: {
       lang: 'tr'
     },
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: 'Flax ERP - Modüler Kurumsal Kaynak Planlama Sistemi' },
+      { hid: 'description', name: 'description', content: 'Flax-ERP - Modüler ERP Sistemi' },
       { name: 'format-detection', content: 'telephone=no' }
     ],
     link: [
@@ -19,12 +19,18 @@ export default {
 
   // Global CSS
   css: [
-    '~/assets/css/main.css'
+    '@/assets/css/main.css'
   ],
+
+  // Server konfigürasyonu
+  server: {
+    host: '0.0.0.0', // Dışarıdan erişime izin ver
+    port: 3000
+  },
 
   // Plugins to run before rendering page
   plugins: [
-    { src: '~/plugins/axios' }
+    '@/plugins/axios.js'
   ],
 
   // Auto import components
@@ -39,12 +45,13 @@ export default {
   // Modules
   modules: [
     '@nuxtjs/axios',
-    '@nuxtjs/auth-next'
+    '@nuxtjs/auth-next',
+    '@nuxtjs/vuetify'
   ],
 
   // Axios module configuration
   axios: {
-    baseURL: process.env.API_URL || 'http://localhost:3001/api',
+    baseURL: process.env.API_URL || 'http://88.218.130.67:3001/api',
     credentials: true
   },
 
@@ -79,6 +86,7 @@ export default {
   // Vuetify module configuration
   vuetify: {
     customVariables: ['~/assets/variables.scss'],
+    treeShake: true,
     theme: {
       dark: false,
       themes: {

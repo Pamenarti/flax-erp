@@ -1,19 +1,24 @@
-FROM node:18-alpine
+FROM node:16-alpine
 
 WORKDIR /app
 
-# Bağımlılıkları kopyala
-COPY package*.json ./
-
-# Bağımlılıkları yükle
+# Bağımlılıkları kopyala ve yükle
+COPY ./package*.json ./
 RUN npm install
 
-# Kaynak kodu kopyala
+# Kaynak dosyaları kopyala
 COPY . .
 
-# Geliştirme modunda çalıştır
-CMD ["npm", "run", "start:dev"]
+# Ortam değişkenlerini ayarla
+ENV NODE_ENV=production
+ENV HOST=0.0.0.0
+ENV PORT=3001
 
-# Prod build için:
-# RUN npm run build
-# CMD ["npm", "run", "start:prod"]
+# Uygulamayı derle
+RUN npm run build
+
+# Portu aç
+EXPOSE 3001
+
+# Uygulamayı başlat
+CMD ["node", "dist/main"]
