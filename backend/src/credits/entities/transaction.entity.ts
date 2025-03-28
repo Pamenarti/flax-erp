@@ -1,11 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
-export enum TransactionType {
-  CREDIT_PURCHASE = 'credit_purchase',
-  MODULE_PURCHASE = 'module_purchase',
-}
-
 @Entity('transactions')
 export class Transaction {
   @PrimaryGeneratedColumn('uuid')
@@ -20,9 +15,9 @@ export class Transaction {
 
   @Column({
     type: 'enum',
-    enum: TransactionType,
+    enum: ['credit_purchase', 'module_purchase'],
   })
-  type: TransactionType;
+  type: 'credit_purchase' | 'module_purchase';
 
   @Column({ nullable: true })
   module_id: string;
