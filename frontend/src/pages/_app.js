@@ -29,6 +29,18 @@ export default function MyApp(props) {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         {shouldUseLayout ? (
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        ) : (
+          <Component {...pageProps} />
+        )}
+      </ThemeProvider>
+    </CacheProvider>
+  );
+}
+
+MyApp.propTypes = {
   Component: PropTypes.elementType.isRequired,
   emotionCache: PropTypes.object,
   pageProps: PropTypes.object.isRequired,
