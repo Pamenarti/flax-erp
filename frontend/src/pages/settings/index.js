@@ -16,8 +16,10 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import BackupIcon from '@mui/icons-material/Backup';
 import BuildIcon from '@mui/icons-material/Build';
 import api from '../../config/api';
+import ModuleGuard from '../../components/ModuleGuard';
 
-export default function Settings() {
+// Renamed to SettingsContent to avoid naming collision
+function SettingsContent() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [activeModules, setActiveModules] = useState(0);
@@ -207,11 +209,11 @@ export default function Settings() {
   );
 }
 
-// ModuleGuard ile sarmala ve export et
+// Only one default export now
 export default function SettingsWithGuard() {
   return (
     <ModuleGuard moduleCode="settings">
-      <Settings />
+      <SettingsContent />
     </ModuleGuard>
   );
 }

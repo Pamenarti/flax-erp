@@ -87,40 +87,65 @@ export default function Layout({ children }) {
         // Kullanıcı bilgilerini ayarla
         setUser(JSON.parse(userData));
         
-        // Aktif modülleri getir
-        const response = await api.get('/modules/active');
-        
-        // Modülleri kategoriye göre grupla ve sırala
-        const groupedModules = response.data.reduce((acc, module) => {
-          const category = module.category || 'Diğer';
-          if (!acc[category]) {
-            acc[category] = [];
+        // Geliştirme mod kontrolü - API bağlantısı olmadığında varsayılan veriler kullan
+        const isDevelopment = process.env.NODE_ENV === 'development';
+
+        try {
+          // SADECE AKTİF modülleri getir
+          const response = await api.get('/modules/active');
+          
+          // Modülleri kategoriye göre grupla ve sırala
+          const groupedModules = response.data.reduce((acc, module) => {
+            // SADECE AKTİF olan modülleri göster
+            if (module.isActive) {
+              const category = module.category || 'Diğer';
+              if (!acc[category]) {
+                acc[category] = [];
+              }
+              acc[category].push(module);
+              
+              // Alt kategori içinde sırala
+              acc[category].sort((a, b) => a.order - b.order);
+            }
+            return acc;
+          }, {});
+          
+          // Kategorileri sırala - Sistem kategorisi her zaman en üstte
+          const orderedModules = {};
+          
+          // Önce Sistem kategorisi
+          if (groupedModules['Sistem']) {
+            orderedModules['Sistem'] = groupedModules['Sistem'];
+            delete groupedModules['Sistem'];
           }
-          acc[category].push(module);
           
-          // Alt kategori içinde sırala
-          acc[category].sort((a, b) => a.order - b.order);
+          // Sonra diğer kategoriler alfabetik
+          Object.keys(groupedModules)
+            .sort()
+            .forEach(key => {
+              orderedModules[key] = groupedModules[key];
+            });
           
-          return acc;
-        }, {});
-        
-        // Kategorileri sırala - Sistem kategorisi her zaman en üstte
-        const orderedModules = {};
-        
-        // Önce Sistem kategorisi
-        if (groupedModules['Sistem']) {
-          orderedModules['Sistem'] = groupedModules['Sistem'];
-          delete groupedModules['Sistem'];
+          setModules(orderedModules);
+        } catch (error) {
+          console.error('Modül verileri alınamadı:', error);
+          
+          // Geliştirme modunda API hata verirse varsayılan modüller kullan
+          if (isDevelopment) {
+            console.warn('API bağlantısı yok, varsayılan temel modülleri kullanarak devam ediliyor');
+            
+            // Sadece temel modüller - SADECE AKTİF
+            const defaultModules = {
+              'Sistem': [
+                { id: '1', name: 'Dashboard', icon: 'DashboardIcon', route: '/dashboard', order: 1, isActive: true },
+                { id: '2', name: 'Kullanıcılar', icon: 'PeopleIcon', route: '/users', order: 2, isActive: true }
+              ]
+            };
+            
+            setModules(defaultModules);
+          }
         }
         
-        // Sonra diğer kategoriler alfabetik
-        Object.keys(groupedModules)
-          .sort()
-          .forEach(key => {
-            orderedModules[key] = groupedModules[key];
-          });
-        
-        setModules(orderedModules);
         setLoading(false);
       } catch (error) {
         console.error('Veri alınamadı:', error);

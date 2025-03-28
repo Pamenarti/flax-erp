@@ -47,7 +47,6 @@ export class ModulesService {
   }
 
   async create(createModuleDto: CreateModuleDto): Promise<Module> {
-    // Modül kodu benzersiz olmalı
     const existingModule = await this.moduleRepository.findOne({
       where: { code: createModuleDto.code },
     });
@@ -63,7 +62,6 @@ export class ModulesService {
   async update(id: string, updateModuleDto: UpdateModuleDto): Promise<Module> {
     const module = await this.findOne(id);
     
-    // Değişiklikleri uygula
     Object.assign(module, updateModuleDto);
     
     return this.moduleRepository.save(module);
@@ -72,7 +70,6 @@ export class ModulesService {
   async remove(id: string): Promise<void> {
     const module = await this.findOne(id);
     
-    // Çekirdek modül kontrolü
     if (module.isCore) {
       throw new ConflictException(`${module.name} bir çekirdek modüldür ve silinemez`);
     }
@@ -86,13 +83,16 @@ export class ModulesService {
   async toggle(id: string, toggleDto: ToggleModuleDto): Promise<Module> {
     const module = await this.findOne(id);
     
-    // Durumu güncelle
     module.isActive = toggleDto.isActive;
     
-    // Bağımlılıklar kontrolü
     if (toggleDto.isActive && module.dependencies && module.dependencies.length > 0) {
-      // Bağımlı modülleri kontrol et
       for (const dependencyCode of module.dependencies) {
+        try {
+          const dependency = await this.findByCode(dependencyCode);
+          
+          if (!dependency.isActive) {
+            throw new ConflictException(
+              `${module.name} modülünü etkinleştirmek için önce ${dependency.name} modülünü etkinleştirmelisiniz.`
         try {
           const dependency = await this.findByCode(dependencyCode);
           

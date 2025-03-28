@@ -11,11 +11,11 @@ import PeopleIcon from '@mui/icons-material/People';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
-import SettingsIcon from '@mui/icons-material/Settings';
-import ExtensionIcon from '@mui/icons-material/Extension';
 import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
+import ExtensionIcon from '@mui/icons-material/Extension'; // Added missing import
 import api from '../config/api';
+import ModuleGuard from '../components/ModuleGuard';
 
 // İstatistik kartı bileşeni 
 const StatCard = ({ title, value, icon, color, compareText, onClick }) => (
@@ -102,7 +102,8 @@ const ModuleCard = ({ module, onClick }) => (
   </Card>
 );
 
-function Dashboard() {
+// Main Dashboard component - renamed to avoid collision
+function DashboardContent() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [serverInfo, setServerInfo] = useState(null);
@@ -439,7 +440,7 @@ function Dashboard() {
 export default function DashboardWithGuard() {
   return (
     <ModuleGuard moduleCode="core">
-      <Dashboard />
+      <DashboardContent />
     </ModuleGuard>
   );
 }
