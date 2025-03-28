@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Box, Container, Typography, Grid, Paper, Divider, 
+import { Box, Container, Typography, Grid, Paper, Card, CardContent, Divider, 
          CircularProgress, LinearProgress, List, ListItem, ListItemText, 
-         ListItemIcon, Button, Chip, Card, CardActionArea,
-         CardContent, Avatar } from '@mui/material';
+         ListItemIcon, Button, AppBar, Toolbar, IconButton, Avatar, Chip } from '@mui/material';
 import { useRouter } from 'next/router';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import InventoryIcon from '@mui/icons-material/Inventory';
@@ -10,25 +9,15 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import PeopleIcon from '@mui/icons-material/People';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import MenuIcon from '@mui/icons-material/Menu';
+import LogoutIcon from '@mui/icons-material/Logout';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
-import ExtensionIcon from '@mui/icons-material/Extension';
 import api from '../config/api';
 
 // İstatistik kartı bileşeni 
 const StatCard = ({ title, value, icon, color, compareText, onClick }) => (
-  <Card 
-    sx={{ 
-      height: '100%',
-      cursor: onClick ? 'pointer' : 'default',
-      transition: 'all 0.2s',
-      '&:hover': onClick ? {
-        transform: 'translateY(-4px)',
-        boxShadow: 3
-      } : {}
-    }}
-    onClick={onClick}
-  >
+  <Card sx={{ height: '100%' }} onClick={onClick}>
     <CardContent>
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <Box>
@@ -59,62 +48,6 @@ const StatCard = ({ title, value, icon, color, compareText, onClick }) => (
   </Card>
 );
 
-// Modül kartı bileşeni
-const ModuleCard = ({ module, onClick }) => {
-  // İkon haritası
-  const getIcon = (iconName) => {
-    const iconMap = {
-      'PeopleIcon': <PeopleIcon fontSize="large" />,
-      'InventoryIcon': <InventoryIcon fontSize="large" />,
-      'ShoppingCartIcon': <ShoppingCartIcon fontSize="large" />,
-      'BarChartIcon': <BarChartIcon fontSize="large" />,
-      'ExtensionIcon': <ExtensionIcon fontSize="large" />,
-    };
-    return iconMap[iconName] || <ExtensionIcon fontSize="large" />;
-  };
-  
-  return (
-    <Card
-      sx={{
-        height: '100%',
-        opacity: module.isActive ? 1 : 0.6,
-        transition: 'all 0.2s'
-      }}
-    >
-      <CardActionArea
-        sx={{ height: '100%', p: 2 }}
-        onClick={onClick}
-        disabled={!module.isActive}
-      >
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-          <Avatar
-            sx={{
-              bgcolor: module.isActive ? 'primary.light' : 'grey.300',
-              color: module.isActive ? 'primary.main' : 'grey.500',
-              width: 64,
-              height: 64,
-              mb: 2
-            }}
-          >
-            {getIcon(module.icon)}
-          </Avatar>
-          <Typography variant="h6" component="div" gutterBottom>
-            {module.name}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            {module.description}
-          </Typography>
-          <Chip
-            label={module.isActive ? 'Etkin' : 'Devre Dışı'}
-            color={module.isActive ? 'success' : 'default'}
-            size="small"
-          />
-        </Box>
-      </CardActionArea>
-    </Card>
-  );
-};
-
 export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -125,8 +58,27 @@ export default function Dashboard() {
     sales: 0,
     revenue: 0
   });
-  const [alerts, setAlerts] = useState([]);
-  const [modules, setModules] = useState([]);
+  const [activeModules, setActiveModules] = useState(0);
+  const [alerts, setAlerts] = useState([
+    {
+      id: 1,
+      type: 'success',
+      message: 'Sistem başarıyla güncellendi',
+      time: '10 dakika önce'
+    },
+    {
+      id: 2,
+      type: 'error',
+      message: 'Stok azalıyor: Ürün #1234',
+      time: '1 saat önce'
+    },
+    {
+      id: 3,
+      type: 'info',
+      message: 'Yeni kullanıcı kaydoldu',
+      time: '3 saat önce'
+    }
+  ]);
   
   const router = useRouter();
 
@@ -149,8 +101,9 @@ export default function Dashboard() {
         setServerInfo(healthResponse.data);
         
         // 2. Aktif modülleri getir
-        const allModulesResponse = await api.get('/modules');
-        setModules(allModulesResponse.data);
+        const modulesResponse = await api.get('/modules/active');
+        const activeModules = modulesResponse.data;
+        setActiveModules(activeModules.length);
         
         // 3. İstatistik verileri - Mock edilmiş ve stok bilgilerini ekledik
         // Gerçek uygulamada bu veriler API'den gelecek
@@ -202,6 +155,12 @@ export default function Dashboard() {
     fetchData();
   }, [router]);
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    router.push('/login');
+  };
+  
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -212,13 +171,45 @@ export default function Dashboard() {
 
   if (!user) return null;
 
-  // Modülleri kategorilere göre grupla
-  const operationalModules = modules.filter(m => m.category === 'Operasyon');
-  const activeModulesCount = modules.filter(m => m.isActive).length;
-  const totalModules = modules.length;
-
   return (
     <Box sx={{ flexGrow: 1 }}>
+      {/* Uygulama Çubuğu */}
+      <AppBar position="static">
+        <Toolbar>
+          <IconButton
+            size="large"
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            sx={{ mr: 2 }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            Flax-ERP Dashboard
+          </Typography>
+          <IconButton color="inherit">
+            <NotificationsIcon />
+          </IconButton>
+          <Box sx={{ display: 'flex', alignItems: 'center', ml: 2 }}>
+            <Avatar sx={{ bgcolor: 'secondary.main', marginRight: 1 }}>
+              {user?.firstName?.[0]}{user?.lastName?.[0]}
+            </Avatar>
+            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+              <Typography variant="body2" component="div">
+                {user?.firstName} {user?.lastName}
+              </Typography>
+              <Typography variant="caption" component="div">
+                {user?.roles?.includes('admin') ? 'Yönetici' : 'Kullanıcı'}
+              </Typography>
+            </Box>
+          </Box>
+          <IconButton color="inherit" onClick={handleLogout} sx={{ ml: 2 }}>
+            <LogoutIcon />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+      
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         {/* Karşılama kartı */}
         <Paper
@@ -252,7 +243,7 @@ export default function Dashboard() {
               sx={{ mr: 1, mb: 1, color: 'white', borderColor: 'white' }} 
             />
             <Chip 
-              label={`Aktif Modüller: ${activeModulesCount}/${totalModules}`} 
+              label={`Aktif Modüller: ${activeModules}/12`} 
               color="secondary" 
               variant="outlined" 
               sx={{ mb: 1, color: 'white', borderColor: 'white' }} 
@@ -269,7 +260,6 @@ export default function Dashboard() {
               icon={<PeopleIcon />}
               color="primary"
               compareText="+2 bu hafta"
-              onClick={() => router.push('/users')}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
@@ -301,55 +291,6 @@ export default function Dashboard() {
             />
           </Grid>
         </Grid>
-        
-        {/* Modüller */}
-        <Paper sx={{ p: 3, mb: 4 }}>
-          <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-            <ExtensionIcon sx={{ mr: 1 }} /> Modüller
-          </Typography>
-          <Typography variant="body2" color="text.secondary" paragraph>
-            Aşağıdaki modüller sisteminizde kurulu. Modül durumları ve bilgileri için tıklayın.
-          </Typography>
-          <Divider sx={{ my: 2 }} />
-          
-          <Grid container spacing={3}>
-            {operationalModules.map((module) => (
-              <Grid item xs={12} sm={6} md={4} key={module.id}>
-                <ModuleCard 
-                  module={module} 
-                  onClick={() => {
-                    if (module.isActive) {
-                      router.push(module.route);
-                    } else {
-                      router.push('/settings/modules');
-                    }
-                  }}
-                />
-              </Grid>
-            ))}
-            
-            <Grid item xs={12} sm={6} md={4}>
-              <Card sx={{ height: '100%', border: '2px dashed #ccc' }}>
-                <CardActionArea 
-                  sx={{ height: '100%', p: 2 }}
-                  onClick={() => router.push('/settings/modules')}
-                >
-                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                    <Avatar sx={{ bgcolor: 'action.hover', width: 64, height: 64, mb: 2 }}>
-                      <ExtensionIcon fontSize="large" />
-                    </Avatar>
-                    <Typography variant="h6" component="div" gutterBottom>
-                      Modül Ekle
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                      Sisteminize yeni modüller ekleyin veya mevcut modülleri yönetin
-                    </Typography>
-                  </Box>
-                </CardActionArea>
-              </Card>
-            </Grid>
-          </Grid>
-        </Paper>
         
         {/* Grafikler ve Tablolar */}
         <Grid container spacing={3}>
