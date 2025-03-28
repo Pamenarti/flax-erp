@@ -16,8 +16,8 @@ import ErrorIcon from '@mui/icons-material/Error';
 import api from '../config/api';
 
 // İstatistik kartı bileşeni 
-const StatCard = ({ title, value, icon, color, compareText }) => (
-  <Card sx={{ height: '100%' }}>
+const StatCard = ({ title, value, icon, color, compareText, onClick }) => (
+  <Card sx={{ height: '100%' }} onClick={onClick}>
     <CardContent>
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <Box>
@@ -100,17 +100,50 @@ export default function Dashboard() {
         const healthResponse = await api.get('/health');
         setServerInfo(healthResponse.data);
         
-        // 2. İstatistik verileri - Mock edilmiş
+        // 2. Aktif modülleri getir
+        const modulesResponse = await api.get('/modules/active');
+        const activeModules = modulesResponse.data;
+        setActiveModules(activeModules.length);
+        
+        // 3. İstatistik verileri - Mock edilmiş ve stok bilgilerini ekledik
         // Gerçek uygulamada bu veriler API'den gelecek
         setStats({
           users: 24,
           products: 156,
           sales: 28,
-          revenue: 14850
+          revenue: 14850,
+          lowStock: 5  // Düşük stok ürün sayısı
         });
         
-        // 3. Aktif modüller - Mock edilmiş
-        setActiveModules(2); // Kullanıcı yönetimi ve gösterge paneli
+        // 4. Uyarılar - Stok uyarılarını ekledik
+        setAlerts([
+          {
+            id: 1,
+            type: 'success',
+            message: 'Sistem başarıyla güncellendi',
+            time: '10 dakika önce'
+          },
+          {
+            id: 2,
+            type: 'error',
+            message: 'Stok azalıyor: Ürün #1234',
+            time: '1 saat önce',
+            link: '/inventory'
+          },
+          {
+            id: 3,
+            type: 'info',
+            message: 'Yeni kullanıcı kaydoldu',
+            time: '3 saat önce'
+          },
+          {
+            id: 4,
+            type: 'warning',
+            message: '5 ürün kritik stok seviyesinde',
+            time: '2 saat önce',
+            link: '/inventory?tab=low-stock'
+          }
+        ]);
         
         setLoading(false);
       } catch (error) {
@@ -235,7 +268,8 @@ export default function Dashboard() {
               value={stats.products} 
               icon={<InventoryIcon />}
               color="success"
-              compareText="+18 bu ay"
+              compareText={`${stats.lowStock} ürün düşük stokta`}
+              onClick={() => router.push('/inventory')}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
@@ -271,7 +305,8 @@ export default function Dashboard() {
               <Box sx={{ mb: 3 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                   <Typography variant="body2">CPU Kullanımı</Typography>
-                  <Typography variant="body2">32%</                </Box>
+                  <Typography variant="body2">32%</Typography>
+                </Box>
                 <LinearProgress variant="determinate" value={32} />
               </Box>
               
@@ -315,12 +350,19 @@ export default function Dashboard() {
               
               <List>
                 {alerts.map((alert) => (
-                  <ListItem key={alert.id} divider>
+                  <ListItem 
+                    key={alert.id} 
+                    divider
+                    button={!!alert.link}
+                    onClick={() => alert.link && router.push(alert.link)}
+                  >
                     <ListItemIcon>
                       {alert.type === 'success' ? (
                         <CheckCircleIcon color="success" />
                       ) : alert.type === 'error' ? (
                         <ErrorIcon color="error" />
+                      ) : alert.type === 'warning' ? (
+                        <NotificationsIcon color="warning" />
                       ) : (
                         <NotificationsIcon color="info" />
                       )}

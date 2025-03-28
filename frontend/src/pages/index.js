@@ -53,8 +53,8 @@ export default function Home() {
       id: 'inventory', 
       title: 'Stok Yönetimi', 
       description: 'Envanter takibi ve stok hareketleri',
-      icon: <InventoryIcon fontSize="large" />,
-      status: 'development',
+      icon: <InventoryIcon fontSize="large" color="primary" />,
+      status: 'active',  // Artık 'active' olarak işaretledik
       url: '/inventory'
     },
     { 

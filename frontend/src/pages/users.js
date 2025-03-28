@@ -13,8 +13,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MenuIcon from '@mui/icons-material/Menu';
 import api from '../config/api';
+import ModuleGuard from '../components/ModuleGuard';
 
-export default function Users() {
+function Users() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
@@ -399,5 +400,14 @@ export default function Users() {
         </Snackbar>
       </Container>
     </Box>
+  );
+}
+
+// ModuleGuard ile sarmala ve export et
+export default function UsersWithGuard() {
+  return (
+    <ModuleGuard moduleCode="users">
+      <Users />
+    </ModuleGuard>
   );
 }

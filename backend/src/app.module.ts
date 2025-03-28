@@ -6,6 +6,9 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersService } from './users/users.service';
+import { InventoryModule } from './inventory/inventory.module';
+import { ModulesModule } from './modules/modules.module';
+import { ModulesService } from './modules/modules.service';
 
 @Module({
   imports: [
@@ -29,15 +32,23 @@ import { UsersService } from './users/users.service';
     }),
     UsersModule,
     AuthModule,
+    InventoryModule,
+    ModulesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule implements OnModuleInit {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private modulesService: ModulesService
+  ) {}
 
   async onModuleInit() {
     // Admin kullanıcısını seed'leme
     await this.usersService.seedAdmin();
+    
+    // Varsayılan modülleri seed'leme
+    await this.modulesService.seedDefaultModules();
   }
 }

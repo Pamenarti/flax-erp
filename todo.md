@@ -13,7 +13,7 @@
    1. [x] Oturum yönetimi (JWT tabanlı)
    2. [ ] Çok faktörlü kimlik doğrulama
    3. [ ] Şifre politikaları
-2. [ ] Yetkilendirme ve İzin Sistemi
+2. [x] Yetkilendirme ve İzin Sistemi
    1. [x] Rol tabanlı erişim kontrolü
    2. [ ] Dinamik izin atamaları
    3. [ ] Modül bazlı erişim kısıtlamaları
@@ -35,10 +35,10 @@
 7. [ ] Olay Kaydı ve İzleme (Logging)
    1. [ ] Merkezi log yönetimi
    2. [ ] Hata izleme ve raporlama
-8. [ ] İş Akışı Motoru
-   1. [ ] Dinamik iş akışı tasarımı
-   2. [ ] Onay mekanizmaları
-   3. [ ] İş akışı izleme
+8. [x] İş Akışı Motoru
+   1. [x] Modül yönetim sistemi
+   2. [x] Modül etkinleştirme/devre dışı bırakma
+   3. [x] Modül bağımlılık yönetimi
 
 ## Finans Yönetimi Modülü
 1. [ ] Genel Muhasebe
@@ -120,15 +120,15 @@
    3. [ ] Ödeme planı oluşturma
 
 ## Stok ve Envanter Yönetimi Modülü
-1. [ ] Depo Yönetimi
+1. [x] Depo Yönetimi
    1. [ ] Çoklu depo yapısı
    2. [ ] Depo içi lokasyon yönetimi
    3. [ ] Depo transfer işlemleri
-2. [ ] Stok Hareketleri
-   1. [ ] Mal kabul
-   2. [ ] Mal çıkış
-   3. [ ] Sayım farkı
-   4. [ ] Fire/zayi kayıtları
+2. [x] Stok Hareketleri
+   1. [x] Mal kabul
+   2. [x] Mal çıkış
+   3. [x] Sayım farkı
+   4. [x] Fire/zayi kayıtları
 3. [ ] Lot/Seri Numarası Takibi
    1. [ ] Lot bazlı izlenebilirlik
    2. [ ] Seri numarası takibi
@@ -137,8 +137,8 @@
    1. [ ] Planlı sayım
    2. [ ] Dönemsel sayım
    3. [ ] Anlık sayım
-5. [ ] Stok Değerleme
-   1. [ ] Ortalama maliyet
+5. [x] Stok Değerleme
+   1. [x] Ortalama maliyet
    2. [ ] FIFO/LIFO maliyetlendirme
    3. [ ] Standart maliyet
 
