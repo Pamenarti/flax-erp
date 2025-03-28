@@ -10,8 +10,8 @@ import { InventoryModule } from './inventory/inventory.module';
 import { ModulesModule } from './modules/modules.module';
 import { ModulesService } from './modules/modules.service';
 import { TempModulesController } from './temp-modules.controller';
-// Yeni modüller buraya import edilecek
-// import { SalesModule } from './modules/sales/sales.module';
+// Satış Modülünü import et
+import { SalesModule } from './modules/sales/sales.module';
 
 @Module({
   imports: [
@@ -38,8 +38,8 @@ import { TempModulesController } from './temp-modules.controller';
     ModulesModule.forRoot(),
     // İsteğe bağlı modüller
     InventoryModule,
-    // Yeni modüller burada aktive edilir,
-    // SalesModule,// Yeni modüller burada aktive edilir
+    // Yeni modülü ekle - kullanıcı tarafından etkinleştirilmesi gerekiyor
+    SalesModule,
   ],
   controllers: [AppController, TempModulesController],
   providers: [AppService],

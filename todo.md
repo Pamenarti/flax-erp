@@ -1,4 +1,37 @@
-# Flax-ERP Proje Todo Listesi
+# Flax ERP Yapılacaklar Listesi
+
+## Modüller
+
+- [x] Core (Çekirdek Sistem) - Temel fonksiyonlar
+- [x] Kullanıcı Yönetimi - Kullanıcı ve izin yönetimi
+- [x] Envanter - Ürün ve stok yönetimi
+- [x] Satış - Müşteri, sipariş ve fatura yönetimi
+- [ ] Satın Alma - Tedarikçi ve satın alma yönetimi
+- [ ] Finans - Muhasebe ve finans yönetimi
+- [ ] İnsan Kaynakları - Personel ve bordro yönetimi
+- [ ] Proje Yönetimi - Projeler ve görevler
+- [ ] Raporlama - Detaylı raporlar ve grafikler
+- [ ] Ayarlar - Sistem ayarları ve yapılandırma
+
+## Öncelikler
+
+1. ✅ Satış Modülü geliştirme
+   - ✅ Müşteri yönetimi
+   - ✅ Sipariş yönetimi
+   - ✅ Satış faturası oluşturma
+   - ✅ Ödeme takibi
+   
+2. Satın Alma Modülü geliştirme
+   - Tedarikçi yönetimi
+   - Satın alma siparişleri
+   - Alım faturası oluşturma
+   - Tedarikçi ödemesi
+
+3. Finans Modülü geliştirme
+   - Gelir ve gider yönetimi
+   - Hesap planı
+   - Nakit akışı takibi
+   - Finansal raporlar
 
 ## Teknoloji Seçimi
 1. [x] Backend: Node.js + NestJS (JavaScript/TypeScript tek dil avantajı)
