@@ -76,47 +76,35 @@ export default {
       
       try {
         console.log('Modüller alınmaya çalışılıyor...');
-        // Öncelikle geçici API uç noktasını deneyelim
-        let response;
-        try {
-          response = await this.$api.get('/api/temp-modules');
-          console.log('Geçici API yanıtı:', response.data);
-        } catch (tempApiError) {
-          console.warn('Geçici API uç noktasına bağlanılamadı, alternatif deneniyor...', tempApiError);
+        
+        // Tüm olası URL'leri deneyecek bir yardımcı fonksiyon
+        const tryUrls = async (urls) => {
+          let lastError = null;
           
-          // Fallback deneme 1: Modules uç noktası
-          try {
-            response = await this.$api.get('/api/modules');
-            console.log('Modules API yanıtı:', response.data);
-          } catch (moduleApiError) {
-            console.warn('Modules API uç noktasına bağlanılamadı, fallback deneniyor...', moduleApiError);
-            
-            // Fallback deneme 2: Fallback uç noktası
+          for (const url of urls) {
             try {
-              response = await this.$api.get('/api/modules/fallback');
-              console.log('Fallback API yanıtı:', response.data);
-            } catch (fallbackError) {
-              console.warn('Fallback API de çalışmadı, direkt endpoint deneniyor...', fallbackError);
-              
-              // Fallback deneme 3: Tam URL ile deneme
-              try {
-                const backendUrl = process.env.VUE_APP_BACKEND_URL || 'http://localhost:3000';
-                response = await fetch(`${backendUrl}/api/modules`);
-                if (!response.ok) {
-                  throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                response = { data };
-                console.log('Direkt Backend API yanıtı:', data);
-              } catch (directError) {
-                console.warn('Direkt API çağrısı da başarısız, varsayılan verileri kullanıyoruz...', directError);
-                // Son çare olarak varsayılan verileri kullan
-                throw new Error('Tüm API uç noktaları başarısız');
-              }
+              console.log(`URL deneniyor: ${url}`);
+              const response = await this.$api.get(url);
+              console.log(`Başarılı yanıt (${url}):`, response.data);
+              return response;
+            } catch (error) {
+              console.warn(`Hata (${url}):`, error.message);
+              lastError = error;
             }
           }
-        }
+          
+          throw lastError || new Error('Tüm URL\'ler başarısız oldu');
+        };
         
+        // Denenecek URL'ler - önce api/modules dizisi
+        const urls = [
+          '/api/modules',
+          '/modules',
+          '/api/temp-modules',
+          '/api/modules/fallback'
+        ];
+        
+        const response = await tryUrls(urls);
         this.modules = response.data;
         
         // Eğer veri boşsa
@@ -128,6 +116,118 @@ export default {
         console.error('Modüller yüklenirken hata oluştu:', error);
         this.error = 'Modüller yüklenemedi. Sunucu ile bağlantı kurulamıyor olabilir.';
         this.modules = this.getFallbackModules();
+      } finally {
+        this.loading = false;
+      }
+    },
+    
+    async enableModule(moduleId) {
+      try {
+        this.loading = true;
+        
+        // Tüm olası URL'leri deneme
+        const urls = [
+          `/api/modules/${moduleId}/enable`,
+          `/modules/${moduleId}/enable`,
+          `/api/temp-modules/${moduleId}/enable`
+        ];
+        
+        let response = null;
+        let lastError = null;
+        
+        for (const url of urls) {
+          try {
+            console.log(`Modül etkinleştirme isteği gönderiliyor: ${url}`);
+            response = await this.$api.post(url);
+            console.log(`Başarılı yanıt:`, response.data);
+            break; // Başarılı olursa döngüden çık
+          } catch (error) {
+            console.warn(`Hata (${url}):`, error.message);
+            lastError = error;
+          }
+        }
+        
+        if (!response) {
+          throw lastError || new Error('Tüm URL\'ler başarısız oldu');
+        }
+        
+        if (response.data.success) {
+          this.$notify({
+            type: 'success',
+            title: 'Başarılı',
+            text: response.data.message || `Modül etkinleştirilmek üzere işaretlendi.`
+          });
+          await this.fetchModules();
+        } else {
+          this.$notify({
+            type: 'error',
+            title: 'Hata',
+            text: response.data.message || 'Modül etkinleştirilemedi.'
+          });
+        }
+      } catch (error) {
+        console.error('Modül etkinleştirme hatası:', error);
+        this.$notify({
+          type: 'error',
+          title: 'Hata',
+          text: 'Modül etkinleştirilemedi. Sunucu ile bağlantı hatası.'
+        });
+      } finally {
+        this.loading = false;
+      }
+    },
+    
+    async disableModule(moduleId) {
+      try {
+        this.loading = true;
+        
+        // Tüm olası URL'leri deneme
+        const urls = [
+          `/api/modules/${moduleId}/disable`,
+          `/modules/${moduleId}/disable`,
+          `/api/temp-modules/${moduleId}/disable`
+        ];
+        
+        let response = null;
+        let lastError = null;
+        
+        for (const url of urls) {
+          try {
+            console.log(`Modül devre dışı bırakma isteği gönderiliyor: ${url}`);
+            response = await this.$api.post(url);
+            console.log(`Başarılı yanıt:`, response.data);
+            break; // Başarılı olursa döngüden çık
+          } catch (error) {
+            console.warn(`Hata (${url}):`, error.message);
+            lastError = error;
+          }
+        }
+        
+        if (!response) {
+          throw lastError || new Error('Tüm URL\'ler başarısız oldu');
+        }
+        
+        if (response.data.success) {
+          this.$notify({
+            type: 'success',
+            title: 'Başarılı',
+            text: response.data.message || `Modül devre dışı bırakılmak üzere işaretlendi.`
+          });
+          await this.fetchModules();
+        } else {
+          this.$notify({
+            type: 'error',
+            title: 'Hata',
+            text: response.data.message || 'Modül devre dışı bırakılamadı.'
+          });
+        }
+      } catch (error) {
+        console.error('Modül devre dışı bırakma hatası:', error);
+        this.$notify({
+          type: 'error',
+          title: 'Hata',
+          text: 'Modül devre dışı bırakılamadı. Sunucu ile bağlantı hatası.'
+        });
       } finally {
         this.loading = false;
       }
@@ -163,73 +263,6 @@ export default {
           dependencies: ['core']
         }
       ];
-    },
-    async enableModule(moduleId) {
-      try {
-        this.loading = true;
-        // Önce geçici API'yi dene
-        let response;
-        try {
-          response = await this.$api.post(`/api/temp-modules/${moduleId}/enable`);
-        } catch (tempApiError) {
-          // Geçici API çalışmazsa normal API'yi dene
-          response = await this.$api.post(`/api/modules/${moduleId}/enable`);
-        }
-        if (response.data.success) {
-          this.$notify({
-            type: 'success',
-            title: 'Başarılı',
-            text: response.data.message || `Modül etkinleştirilmek üzere işaretlendi.`
-          });
-          // Modül listesini güncelle
-          await this.fetchModules();
-        } else {
-          this.$notify({
-            type: 'error',
-            title: 'Hata',
-            text: response.data.message || 'Modül etkinleştirilemedi.'
-          });
-        }
-      } catch (error) {
-        console.error('Modül etkinleştirme hatası:', error);
-        this.$notify({
-          type: 'error',
-          title: 'Hata',
-          text: 'Modül etkinleştirilemedi. Sunucu ile bağlantı hatası.'
-        });
-      } finally {
-        this.loading = false;
-      }
-    },
-    async disableModule(moduleId) {
-      try {
-        this.loading = true;
-        const response = await this.$api.post(`/api/modules/${moduleId}/disable`);
-        if (response.data.success) {
-          this.$notify({
-            type: 'success',
-            title: 'Başarılı',
-            text: response.data.message || `Modül devre dışı bırakılmak üzere işaretlendi.`
-          });
-          // Modül listesini güncelle
-          await this.fetchModules();
-        } else {
-          this.$notify({
-            type: 'error',
-            title: 'Hata',
-            text: response.data.message || 'Modül devre dışı bırakılamadı.'
-          });
-        }
-      } catch (error) {
-        console.error('Modül devre dışı bırakma hatası:', error);
-        this.$notify({
-          type: 'error',
-          title: 'Hata',
-          text: 'Modül devre dışı bırakılamadı. Sunucu ile bağlantı hatası.'
-        });
-      } finally {
-        this.loading = false;
-      }
     }
   }
 };

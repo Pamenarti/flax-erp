@@ -36,16 +36,47 @@ module.exports = defineConfig({
       '/api': {
         target: BACKEND_URL,
         changeOrigin: true,
+        pathRewrite: { '^/api': '/api' }, // Aynı path'i koruyoruz
         secure: false,
         logLevel: 'debug',
-        onProxyReq(proxyReq, req, res) {
-          console.log(`[Proxy] ${req.method} ${req.url} -> ${BACKEND_URL}${proxyReq.path}`);
+        bypass: function(req, res, proxyOptions) {
+          console.log('Proxy request:', req.method, req.url);
         },
-        onError(err, req, res) {
-          console.error(`[Proxy Error] ${req.method} ${req.url}: ${err.message}`);
+        onProxyRes: function(proxyRes, req, res) {
+          console.log('Proxy response:', proxyRes.statusCode, req.url);
+        },
+        onError: function (err, req, res) {
+          console.error('Proxy error:', err);
           
-          // Proxy hatası durumunda fallback yanıt
-          if (req.url.includes('/api/modules')) {
+          // Özel modül endpoint hataları için fallback yanıtlar
+          if (req.url.includes('/modules')) {
+            console.log('Providing fallback data for module request:', req.url);
+            
+            // active endpoint için
+            if (req.url.includes('/modules/active')) {
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify([
+                {
+                  code: 'core',
+                  name: 'Çekirdek Sistem',
+                  description: 'Temel sistem bileşenleri',
+                  version: '1.0.0',
+                  isActive: true,
+                  isCore: true
+                },
+                {
+                  code: 'users',
+                  name: 'Kullanıcı Yönetimi',
+                  description: 'Kullanıcı yönetimi',
+                  version: '1.0.0',
+                  isActive: true,
+                  isCore: true
+                }
+              ]));
+              return;
+            }
+            
+            // genel modules endpoint için
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify([
               {
@@ -55,12 +86,31 @@ module.exports = defineConfig({
                 version: '1.0.0',
                 isActive: true,
                 isCore: true
+              },
+              {
+                code: 'users',
+                name: 'Kullanıcı Yönetimi',
+                description: 'Kullanıcı yönetimi',
+                version: '1.0.0',
+                isActive: true,
+                isCore: true
+              },
+              {
+                code: 'inventory',
+                name: 'Stok Yönetimi',
+                description: 'Envanter ve stok yönetimi',
+                version: '1.0.0',
+                isActive: false,
+                isCore: false,
+                dependencies: ['core']
               }
             ]));
-          } else {
-            res.writeHead(500);
-            res.end('Proxy Error: ' + err.message);
+            return;
           }
+          
+          // Diğer API hatalarında standard hata yanıtı döndür
+          res.writeHead(500);
+          res.end('Proxy Error: ' + err.message);
         }
       }
     }

@@ -1,5 +1,6 @@
-import { Controller, Get, Logger, All, Post, Param } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, Logger, All, Req, Res } from '@nestjs/common';
 import { AppService } from './app.service';
+import { Request, Response } from 'express';
 
 @Controller()
 export class AppController {
@@ -9,7 +10,7 @@ export class AppController {
 
   @Get()
   getHello(): string {
-    this.logger.log('Anasayfa istendi');
+    this.logger.log('Anasayfa isteği alındı');
     return this.appService.getHello();
   }
 
@@ -26,104 +27,130 @@ export class AppController {
     };
   }
 
+  // Varsayılan modül verileri
+  private readonly allModules = [
+    {
+      code: 'core',
+      name: 'Çekirdek Sistem',
+      description: 'Temel sistem bileşenleri ve gösterge paneli',
+      version: '1.0.0',
+      isActive: true,
+      isCore: true,
+      dependencies: []
+    },
+    {
+      code: 'users',
+      name: 'Kullanıcı Yönetimi',
+      description: 'Kullanıcı hesapları ve yetkilendirme',
+      version: '1.0.0',
+      isActive: true,
+      isCore: true,
+      dependencies: ['core']
+    },
+    {
+      code: 'inventory',
+      name: 'Stok Yönetimi',
+      description: 'Envanter takibi ve stok hareketleri',
+      version: '1.0.0',
+      isActive: false,
+      isCore: false,
+      dependencies: ['core']
+    }
+  ];
+
+  private readonly activeModules = [
+    {
+      code: 'core',
+      name: 'Çekirdek Sistem',
+      description: 'Temel sistem bileşenleri ve gösterge paneli',
+      version: '1.0.0',
+      isActive: true,
+      isCore: true,
+      dependencies: []
+    },
+    {
+      code: 'users',
+      name: 'Kullanıcı Yönetimi',
+      description: 'Kullanıcı hesapları ve yetkilendirme',
+      version: '1.0.0',
+      isActive: true,
+      isCore: true,
+      dependencies: ['core']
+    }
+  ];
+
+  // API endpoint için log ve response helper fonksiyonu
+  private logAndRespond(req: Request, endpoint: string, data: any) {
+    this.logger.log(`${req.method} ${endpoint} isteği alındı [URL: ${req.url}]`);
+    return data;
+  }
+
+  // Tüm modüller
+  @Get('modules')
+  getAllModulesRoot(@Req() req: Request) {
+    return this.logAndRespond(req, '/modules', this.allModules);
+  }
+
   @Get('api/modules')
-  getAllModules() {
-    this.logger.log('GET /api/modules isteği controller dışından alındı');
-    return [
-      {
-        code: 'core',
-        name: 'Çekirdek Sistem',
-        description: 'Temel sistem bileşenleri ve gösterge paneli',
-        version: '1.0.0',
-        isActive: true,
-        isCore: true,
-        dependencies: []
-      },
-      {
-        code: 'users',
-        name: 'Kullanıcı Yönetimi',
-        description: 'Kullanıcı hesapları ve yetkilendirme',
-        version: '1.0.0',
-        isActive: true,
-        isCore: true,
-        dependencies: ['core']
-      },
-      {
-        code: 'inventory',
-        name: 'Stok Yönetimi',
-        description: 'Envanter takibi ve stok hareketleri',
-        version: '1.0.0',
-        isActive: false,
-        isCore: false,
-        dependencies: ['core']
-      }
-    ];
+  getAllModules(@Req() req: Request) {
+    return this.logAndRespond(req, '/api/modules', this.allModules);
+  }
+
+  // Aktif modüller
+  @Get('modules/active')
+  getActiveModulesRoot(@Req() req: Request) {
+    return this.logAndRespond(req, '/modules/active', this.activeModules);
   }
 
   @Get('api/modules/active')
-  getActiveModules() {
-    this.logger.log('GET /api/modules/active isteği controller dışından alındı');
-    return [
-      {
-        code: 'core',
-        name: 'Çekirdek Sistem',
-        description: 'Temel sistem bileşenleri ve gösterge paneli',
-        version: '1.0.0',
-        isActive: true,
-        isCore: true,
-        dependencies: []
-      },
-      {
-        code: 'users',
-        name: 'Kullanıcı Yönetimi',
-        description: 'Kullanıcı hesapları ve yetkilendirme',
-        version: '1.0.0',
-        isActive: true,
-        isCore: true,
-        dependencies: ['core']
-      }
-    ];
+  getActiveModules(@Req() req: Request) {
+    return this.logAndRespond(req, '/api/modules/active', this.activeModules);
   }
 
-  @All('api/modules/fallback')
-  moduleFallback() {
-    this.logger.log('Modül fallback isteği alındı');
-    return [
-      {
-        code: 'core',
-        name: 'Çekirdek Sistem',
-        description: 'Temel sistem fonksiyonları',
-        version: '1.0.0',
-        isActive: true,
-        isCore: true
-      },
-      {
-        code: 'users',
-        name: 'Kullanıcı Yönetimi',
-        description: 'Kullanıcı hesapları ve yetkilendirme',
-        isActive: true,
-        isCore: true,
-        version: '1.0.0',
-        dependencies: ['core']
-      }
-    ];
+  // Fallback endpoint
+  @All(['modules/fallback', 'api/modules/fallback'])
+  moduleFallback(@Req() req: Request) {
+    return this.logAndRespond(req, '/api/modules/fallback', this.allModules);
   }
 
-  @Post('api/modules/:id/enable')
-  enableModule(@Param('id') id: string) {
-    this.logger.log(`POST /api/modules/${id}/enable isteği controller dışından alındı`);
+  // Modül yönetimi endpointleri
+  @Post(['modules/:id/enable', 'api/modules/:id/enable'])
+  enableModule(@Param('id') id: string, @Req() req: Request) {
+    this.logger.log(`POST /api/modules/${id}/enable isteği alındı [URL: ${req.url}]`);
     return {
       success: true,
       message: `"${id}" modülü etkinleştirilmek üzere işaretlendi. .env dosyasını güncelleyin.`
     };
   }
 
-  @Post('api/modules/:id/disable')
-  disableModule(@Param('id') id: string) {
-    this.logger.log(`POST /api/modules/${id}/disable isteği controller dışından alındı`);
+  @Post(['modules/:id/disable', 'api/modules/:id/disable'])
+  disableModule(@Param('id') id: string, @Req() req: Request) {
+    this.logger.log(`POST /api/modules/${id}/disable isteği alındı [URL: ${req.url}]`);
     return {
       success: true,
       message: `"${id}" modülü devre dışı bırakılmak üzere işaretlendi. .env dosyasını güncelleyin.`
     };
+  }
+
+  // Catch-all endpoint - debug için
+  @All('*')
+  catchAll(@Req() req: Request, @Res() res: Response) {
+    const url = req.url;
+    this.logger.warn(`Bilinmeyen istek: ${req.method} ${url}`);
+    
+    // Eğer modules ile ilgili bir istek ise ve bilinmeyen bir endpoint ise
+    if (url.includes('modules')) {
+      if (url.includes('active')) {
+        return res.json(this.activeModules);
+      }
+      return res.json(this.allModules);
+    }
+    
+    // Diğer bilinmeyen istekler için basit yanıt
+    return res.status(404).json({
+      status: 404,
+      message: `Route not found: ${req.method} ${url}`,
+      timestamp: new Date().toISOString()
+    });
   }
 }
