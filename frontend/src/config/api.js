@@ -6,6 +6,9 @@ const API_URL = typeof window !== 'undefined'
   ? '/api' // Tarayıcı için rölatif yol
   : process.env.BACKEND_URL || 'http://localhost:3000';
 
+// Mock modu etkin mi kontrol et
+const isMockEnabled = process.env.API_MOCK_ENABLED === 'true';
+
 // Axios instance oluştur
 const api = axios.create({
   baseURL: API_URL,
@@ -15,9 +18,6 @@ const api = axios.create({
   }
 });
 
-// Mock modu aktif mi kontrolü
-const isMockEnabled = process.env.NODE_ENV === 'development';
-
 // Request interceptor - token ve mock kontrolü
 api.interceptors.request.use(
   async config => {
@@ -26,6 +26,24 @@ api.interceptors.request.use(
       const token = localStorage.getItem('token');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+
+    // Mock API modu
+    if (isMockEnabled && process.env.NODE_ENV === 'development') {
+      try {
+        console.log(`[Mock API] ${config.method?.toUpperCase()} ${config.url}`);
+        // Mock API yanıtını al ve dön
+        const mockResponse = await mockApiHandler(config);
+        if (mockResponse) {
+          // Axios isteğini iptal et ve mock yanıtı döndür
+          return Promise.reject({
+            isMockResponse: true,
+            response: mockResponse
+          });
+        }
+      } catch (error) {
+        console.warn('[Mock API] Hata:', error);
       }
     }
 
@@ -39,20 +57,10 @@ api.interceptors.request.use(
 // Response interceptor - mock yanıtları ve hataları yönet
 api.interceptors.response.use(
   response => response,
-  async error => {
-    // Developer modunda ve API 404 hatası varsa mock yanıt kullan
-    if (isMockEnabled && error.response && error.response.status === 404) {
-      try {
-        console.log(`[Mock API] Intercepting failed request to ${error.config.url}`);
-        const mockResponse = await mockApiHandler(error.config);
-        
-        if (mockResponse) {
-          console.log(`[Mock API] Returning mock data for ${error.config.url}`);
-          return Promise.resolve(mockResponse);
-        }
-      } catch (mockError) {
-        console.warn('[Mock API] Error generating mock response:', mockError);
-      }
+  error => {
+    // Mock yanıtı ise gerçek yanıt gibi dön
+    if (error.isMockResponse) {
+      return error.response;
     }
     
     // API hatalarında konsola detaylı hata mesajı

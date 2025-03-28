@@ -15,15 +15,15 @@ export class CreateModuleDto {
 
   @IsOptional()
   @IsBoolean()
-  isActive?: boolean;
+  isActive?: boolean = false;
 
   @IsOptional()
   @IsBoolean()
-  isCore?: boolean;
+  isCore?: boolean = false;
 
   @IsOptional()
   @IsString()
-  version?: string;
+  version?: string = '1.0.0';
 
   @IsOptional()
   @IsString()
@@ -35,7 +35,7 @@ export class CreateModuleDto {
 
   @IsOptional()
   @IsNumber()
-  order?: number;
+  order?: number = 100;
 
   @IsOptional()
   @IsArray()

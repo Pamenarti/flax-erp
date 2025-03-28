@@ -35,7 +35,7 @@ import { ModulesService } from './modules/modules.service';
     // Çekirdek modüller
     UsersModule,
     AuthModule,
-    ModulesModule,
+    ModulesModule.forRoot(),
     
     // İsteğe bağlı modüller
     InventoryModule,

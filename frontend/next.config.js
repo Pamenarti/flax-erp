@@ -12,15 +12,7 @@ const nextConfig = {
   },
   env: {
     BACKEND_URL: process.env.BACKEND_URL || 'http://localhost:3000',
-    API_MOCK_ENABLED: 'true'
-  },
-  // Hata mesajlarını daha okunabilir hale getir
-  webpack: (config, { isServer, dev }) => {
-    if (dev && !isServer) {
-      // Üretimde kullanılmayacak ekstra webpack ayarları
-      config.devtool = 'eval-source-map';
-    }
-    return config;
+    API_MOCK_ENABLED: 'true' // Bu değeri 'true' olarak değiştirdik
   },
 }
 

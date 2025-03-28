@@ -11,8 +11,11 @@ export class Module {
   @Column()
   name: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, type: 'text' })
   description: string;
+
+  @Column({ default: '1.0.0' })
+  version: string;
 
   @Column({ default: false })
   isActive: boolean;
@@ -20,23 +23,20 @@ export class Module {
   @Column({ default: false })
   isCore: boolean;
 
-  @Column({ nullable: true })
-  version: string;
-
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   icon: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   route: string;
 
-  @Column({ default: 0 })
+  @Column({ type: 'int', default: 100 })
   order: number;
 
-  @Column('simple-array', { nullable: true })
-  dependencies: string[];
-
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   category: string;
+
+  @Column({ type: 'simple-array', nullable: true })
+  dependencies: string[];
 
   @CreateDateColumn()
   createdAt: Date;

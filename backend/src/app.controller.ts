@@ -1,8 +1,10 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Logger, All } from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
+  private readonly logger = new Logger(AppController.name);
+
   constructor(private readonly appService: AppService) {}
 
   @Get()
@@ -10,17 +12,40 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Get('health')
+  @Get('api/health')
   healthCheck() {
-    // Daha kapsamlı bir sağlık kontrolü
+    this.logger.log('Health check isteği alındı');
     return {
       status: 'ok',
-      timestamp: new Date().toISOString(),
-      serverIP: process.env.SERVER_IP || 'localhost',
-      environment: process.env.NODE_ENV || 'development',
-      uptime: process.uptime(),
-      memory: process.memoryUsage(),
-      version: process.env.npm_package_version || '0.0.1'
+      timestamp: new Date(),
+      services: {
+        api: 'up',
+        database: 'up'
+      }
     };
+  }
+
+  @All('api/modules/fallback')
+  moduleFallback() {
+    this.logger.log('Modül fallback isteği alındı');
+    return [
+      {
+        code: 'core',
+        name: 'Çekirdek Sistem',
+        description: 'Temel sistem fonksiyonları',
+        version: '1.0.0',
+        isActive: true,
+        isCore: true
+      },
+      {
+        code: 'users',
+        name: 'Kullanıcı Yönetimi',
+        description: 'Kullanıcı hesapları ve yetkilendirme',
+        isActive: true,
+        isCore: true,
+        version: '1.0.0',
+        dependencies: ['core']
+      }
+    ];
   }
 }

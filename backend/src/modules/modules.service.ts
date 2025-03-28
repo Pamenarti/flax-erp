@@ -109,6 +109,26 @@ export class ModulesService {
     return this.moduleRepository.save(module);
   }
 
+  async enable(id: number): Promise<Module> {
+    const module = await this.moduleRepository.findOne({ where: { id } });
+    if (!module) {
+      throw new Error('Modül bulunamadı');
+    }
+    
+    module.isActive = true;
+    return this.moduleRepository.save(module);
+  }
+
+  async disable(id: number): Promise<Module> {
+    const module = await this.moduleRepository.findOne({ where: { id } });
+    if (!module) {
+      throw new Error('Modül bulunamadı');
+    }
+    
+    module.isActive = false;
+    return this.moduleRepository.save(module);
+  }
+
   async seedDefaultModules(): Promise<void> {
     const defaultModules = [
       {
