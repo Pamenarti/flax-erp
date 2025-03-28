@@ -32,35 +32,30 @@ import { TempModulesController } from './temp-modules.controller';
         synchronize: configService.get<boolean>('DB_SYNCHRONIZE', true),
         autoLoadEntities: true,
       }),
-    }),arma sırasını değiştirelim
-    // Çekirdek modüllere.forRoot(), // Bu modülü önce içe aktaralım
+    }),
     UsersModule,
     AuthModule,
-    ModulesModule.forRoot(),UsersModule,
-    
+    ModulesModule.forRoot(),
     // İsteğe bağlı modüller
     InventoryModule,
     // Yeni modüller burada aktive edilir,
     // SalesModule,// Yeni modüller burada aktive edilir
   ],
   controllers: [AppController, TempModulesController],
-  providers: [AppService],controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule implements OnModuleInit {
-  constructor(uleInit {
+  constructor(
     private usersService: UsersService,
-    private modulesService: ModulesServiceivate usersService: UsersService,
-  ) {}    private modulesService: ModulesService
+    private modulesService: ModulesService
+  ) {}
 
   async onModuleInit() {
-    // Admin kullanıcısını seed'leme
-    await this.usersService.seedAdmin();try {
-    e
-    // Varsayılan modülleri seed'leme
-    await this.modulesService.seedDefaultModules();   
-  }     // Varsayılan modülleri seed'leme
-}      await this.modulesService.seedDefaultModules();
-
+    try {
+      // Admin kullanıcısını seed'leme
+      await this.usersService.seedAdmin();
+      // Varsayılan modülleri seed'leme
+      await this.modulesService.seedDefaultModules();
     } catch (error) {
       console.error('Başlatma sırasında hata:', error);
     }
