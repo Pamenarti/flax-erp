@@ -9,6 +9,8 @@ import { UsersService } from './users/users.service';
 import { InventoryModule } from './inventory/inventory.module';
 import { ModulesModule } from './modules/modules.module';
 import { ModulesService } from './modules/modules.service';
+// Yeni modüller buraya import edilecek
+// import { SalesModule } from './modules/sales/sales.module';
 
 @Module({
   imports: [
@@ -30,10 +32,15 @@ import { ModulesService } from './modules/modules.service';
         autoLoadEntities: true,
       }),
     }),
+    // Çekirdek modüller
     UsersModule,
     AuthModule,
-    InventoryModule,
     ModulesModule,
+    
+    // İsteğe bağlı modüller
+    InventoryModule,
+    // Yeni modüller burada aktive edilir
+    // SalesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

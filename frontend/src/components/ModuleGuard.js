@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { Box, Typography, Button, CircularProgress, Paper, Container, Alert } from '@mui/material';
 import ExtensionOffIcon from '@mui/icons-material/ExtensionOff';
 import api from '../config/api';
+import { getDefaultModules } from '../mock/modules-mock';
 
 // ModuleGuard bileşeni: Bir modülün aktif olup olmadığını kontrol eder
 const ModuleGuard = ({ children, moduleCode }) => {
@@ -19,37 +20,57 @@ const ModuleGuard = ({ children, moduleCode }) => {
       return;
     }
 
-    // Geliştirme modunda test için - API yok ise geçici bypass et
+    // Geliştirme modu ve API mock kontrolü
     const isDevelopment = process.env.NODE_ENV === 'development';
+    const isMockEnabled = process.env.API_MOCK_ENABLED === 'true';
 
     // Modülün aktif olup olmadığını kontrol et
     const checkModule = async () => {
       try {
-        // Geliştirme modunda API bypass seçeneği (hızlı geliştirme için)
-        if (isDevelopment && moduleCode) {
-          console.warn('API bağlantısı yok, geliştirme modunda ModuleGuard bypass ediliyor');
-          setIsModuleActive(true);
+        // API mock kontrolü - geliştirme sırasında API'ye bağlı olmadan çalışabilmek için
+        if (isDevelopment && isMockEnabled) {
+          console.warn('API mock modu aktif, gerçek API yerine mock veriler kullanılıyor');
+          
+          // Core ve settings modülleri her zaman aktif
+          if (moduleCode === 'core' || moduleCode === 'settings' || moduleCode === 'users') {
+            setIsModuleActive(true);
+            setLoading(false);
+            return;
+          }
+          
+          // Mock modüller
+          const mockModules = getDefaultModules();
+          const isActive = mockModules.some(module => module.code === moduleCode && module.isActive);
+          setIsModuleActive(isActive);
           setLoading(false);
           return;
         }
         
-        // Tüm aktif modülleri getir
+        // Gerçek API isteği - tüm aktif modülleri getir
         const response = await api.get('/modules/active');
         const activeModules = response.data;
         
-        // Modül kontrolü
+        // Modül kontrolü - açık olan modüllerde var mı?
         const isActive = activeModules.some(module => module.code === moduleCode);
         setIsModuleActive(isActive);
         setLoading(false);
       } catch (error) {
         console.error('Modül kontrolü yapılamadı:', error);
         
-        // Geliştirme modunda API çalışmıyorsa geçici olarak erişime izin ver
+        // Geliştirme modunda API çalışmıyorsa geliştirmeyi kolaylaştırmak için
         if (isDevelopment) {
-          console.warn('API bağlantısı yok, geliştirme modunda erişime izin veriliyor');
-          setIsModuleActive(true);
+          console.warn('API bağlantısı yok, temel modüllere erişim otomatik olarak sağlanıyor');
+          
+          // Geliştirme modunda tüm sayfalara erişim sağla
+          if (moduleCode === 'core' || moduleCode === 'settings' || moduleCode === 'users') {
+            setIsModuleActive(true);
+          } else {
+            // Sadece inventory modülüne erişim sağla, diğerleri için erişimi engelle
+            setIsModuleActive(moduleCode === 'inventory');
+          }
           setLoading(false);
         } else {
+          // Üretim modunda hatayı göster
           setError('Modül durumu kontrol edilirken bir hata oluştu. API bağlantısı kontrol edin.');
           setLoading(false);
           setIsModuleActive(false);

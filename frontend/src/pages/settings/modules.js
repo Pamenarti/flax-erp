@@ -130,8 +130,10 @@ const ModuleCard = ({ module, onToggle, onEdit, onInfo, onDelete }) => {
         <Button 
           size="small" 
           color={module.isActive ? 'error' : 'success'}
+          variant={module.isActive ? 'outlined' : 'contained'}
           onClick={() => onToggle(module)}
           disabled={module.isCore && module.isActive} // Çekirdek ve aktifse devre dışı bırakılamaz
+          sx={{ fontWeight: 'bold' }}
         >
           {module.isActive ? 'Devre Dışı Bırak' : 'Etkinleştir'}
         </Button>

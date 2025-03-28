@@ -93,13 +93,6 @@ export class ModulesService {
           if (!dependency.isActive) {
             throw new ConflictException(
               `${module.name} modülünü etkinleştirmek için önce ${dependency.name} modülünü etkinleştirmelisiniz.`
-        try {
-          const dependency = await this.findByCode(dependencyCode);
-          
-          // Bağımlı modül aktif değilse hata ver
-          if (!dependency.isActive) {
-            throw new ConflictException(
-              `${module.name} modülünü etkinleştirmek için önce ${dependency.name} modülünü etkinleştirmelisiniz.`
             );
           }
         } catch (error) {
@@ -147,7 +140,7 @@ export class ModulesService {
         code: 'inventory',
         name: 'Stok Yönetimi',
         description: 'Envanter takibi ve stok hareketleri',
-        isActive: true,
+        isActive: false,
         isCore: false,
         version: '1.0.0',
         icon: 'InventoryIcon',

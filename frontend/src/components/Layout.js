@@ -26,6 +26,7 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import GroupWorkIcon from '@mui/icons-material/GroupWork';
 import ExtensionIcon from '@mui/icons-material/Extension';
 import api from '../config/api';
+import { getDefaultModules } from '../mock/modules-mock';
 
 // Sidebar genişliği
 const drawerWidth = 260;
@@ -87,11 +88,36 @@ export default function Layout({ children }) {
         // Kullanıcı bilgilerini ayarla
         setUser(JSON.parse(userData));
         
-        // Geliştirme mod kontrolü - API bağlantısı olmadığında varsayılan veriler kullan
+        // Geliştirme mod kontrolü
         const isDevelopment = process.env.NODE_ENV === 'development';
+        const isMockEnabled = process.env.API_MOCK_ENABLED === 'true';
 
         try {
-          // SADECE AKTİF modülleri getir
+          // Mock mod kontrolü
+          if (isDevelopment && isMockEnabled) {
+            console.warn('API mock modu aktif, gerçek API yerine mock veriler kullanılıyor');
+            const mockModules = getDefaultModules();
+            
+            // Sadece aktif modülleri filtreleme
+            const activeModules = mockModules.filter(module => module.isActive);
+            
+            // Modülleri kategoriye göre grupla
+            const groupedModules = activeModules.reduce((acc, module) => {
+              const category = module.category || 'Diğer';
+              if (!acc[category]) {
+                acc[category] = [];
+              }
+              acc[category].push(module);
+              acc[category].sort((a, b) => a.order - b.order);
+              return acc;
+            }, {});
+            
+            setModules(groupedModules);
+            setLoading(false);
+            return;
+          }
+          
+          // Gerçek API isteği
           const response = await api.get('/modules/active');
           
           // Modülleri kategoriye göre grupla ve sırala
@@ -134,19 +160,24 @@ export default function Layout({ children }) {
           if (isDevelopment) {
             console.warn('API bağlantısı yok, varsayılan temel modülleri kullanarak devam ediliyor');
             
-            // Sadece temel modüller - SADECE AKTİF
-            const defaultModules = {
-              'Sistem': [
-                { id: '1', name: 'Dashboard', icon: 'DashboardIcon', route: '/dashboard', order: 1, isActive: true },
-                { id: '2', name: 'Kullanıcılar', icon: 'PeopleIcon', route: '/users', order: 2, isActive: true }
-              ]
-            };
+            // Mock data'dan modülleri al ve grupla
+            const mockModules = getDefaultModules();
+            const activeModules = mockModules.filter(module => module.isActive);
             
-            setModules(defaultModules);
+            const groupedModules = activeModules.reduce((acc, module) => {
+              const category = module.category || 'Diğer';
+              if (!acc[category]) {
+                acc[category] = [];
+              }
+              acc[category].push(module);
+              acc[category].sort((a, b) => a.order - b.order);
+              return acc;
+            }, {});
+            
+            setModules(groupedModules);
           }
+          setLoading(false);
         }
-        
-        setLoading(false);
       } catch (error) {
         console.error('Veri alınamadı:', error);
         setLoading(false);

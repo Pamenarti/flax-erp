@@ -1,21 +1,26 @@
 import axios from 'axios';
+import { mockApiHandler } from '../mock/api-mock';
 
-// API URL yapılandırması - doğru yola yönlendir
+// API URL yapılandırması
 const API_URL = typeof window !== 'undefined' 
-  ? '/api' // Tarayıcı için rölatif yol (proxy'ye gidecek)
+  ? '/api' // Tarayıcı için rölatif yol
   : process.env.BACKEND_URL || 'http://localhost:3000';
 
+// Axios instance oluştur
 const api = axios.create({
   baseURL: API_URL,
-  timeout: 10000,
+  timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
   }
 });
 
-// Request interceptor - token ekler
+// Mock modu aktif mi kontrolü
+const isMockEnabled = process.env.NODE_ENV === 'development';
+
+// Request interceptor - token ve mock kontrolü
 api.interceptors.request.use(
-  config => {
+  async config => {
     // Token varsa ekle
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('token');
@@ -23,6 +28,7 @@ api.interceptors.request.use(
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
+
     return config;
   },
   error => {
@@ -30,21 +36,37 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor - hataları yönet
+// Response interceptor - mock yanıtları ve hataları yönet
 api.interceptors.response.use(
   response => response,
-  error => {
-    // API hatalarında sadece konsola yazdır
+  async error => {
+    // Developer modunda ve API 404 hatası varsa mock yanıt kullan
+    if (isMockEnabled && error.response && error.response.status === 404) {
+      try {
+        console.log(`[Mock API] Intercepting failed request to ${error.config.url}`);
+        const mockResponse = await mockApiHandler(error.config);
+        
+        if (mockResponse) {
+          console.log(`[Mock API] Returning mock data for ${error.config.url}`);
+          return Promise.resolve(mockResponse);
+        }
+      } catch (mockError) {
+        console.warn('[Mock API] Error generating mock response:', mockError);
+      }
+    }
+    
+    // API hatalarında konsola detaylı hata mesajı
     console.error('API Error:', error.message, error.config?.url);
     
     if (error.response && error.response.status === 401) {
-      // Token süresi dolmuş veya geçersiz
-      if (typeof window !== 'undefined') {
+      // Token süresi dolmuş veya geçersiz (geliştirme ortamında bu kontrolü atlayalım)
+      if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'development') {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         window.location.href = '/login';
       }
     }
+    
     return Promise.reject(error);
   }
 );
