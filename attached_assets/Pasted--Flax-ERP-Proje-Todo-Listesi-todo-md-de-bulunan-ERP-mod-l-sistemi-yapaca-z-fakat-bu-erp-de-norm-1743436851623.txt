@@ -1,0 +1,658 @@
+# Flax-ERP Proje Todo Listesi
+todo.md de bulunan ERP + modül sistemi yapacağız fakat bu erp de normal web platform olacak ve üyelik sistemi ile modüller satacağız.
+
+todo.md inceleyerek geliştirmeye bşalayalım.  hiç bir modul yapmadan şimdilik sadece todo.md de bulunan "Yapılması gerekenler" kısmı ve  "Teknoloji Seçimi" başlıkları altındakileri geliştirmeye başlayalım
+
+en son sistemi başlatmak ve geliştirme ortamı için start.sh oluşturalım. start stop setup ve status parametreleri koyalım logları inceleyelim.
+
+
+Lütfen en ince ayrıntısına kadar incele ve geliştirmeye başla!
+
+Yapılması gerekenler!
+- şık ve modern bir ana sayfamız olacak.
+- her modul geliştirdiğimiz de ana sayfamıza ekleyeceğiz bu modulleri.
+- üyelerin kredileri olacak ve bu krediler postgres veritabanında tutulacak.
+- üyeler girdiğinde şık bir dashboard sayfası ile karşılanacak.
+- sidebar sağ tarafta olmalı.
+- live geliştirme ortamı ayarlanacak. start.sh ile setup, start, restart, status, gibi gerekli parametreler ile tek bash betiğinde kullanacağız projeyi. !!! önemli!
+- Nuxt.js kullanılacak frontend kısmında yeterli gelmez ise Next ve React de kullanılacak. 
+- sidebarımız olacak login olduktan sonra. 
+- modüller alanı olacak ve sistemimiz de ERP ile ilgili tüm modüller burada listelenecek.
+- modüller için ayrı bir klasör olacak geliştirmekte olduğumuz tüm modülleri burada geliştireceğiz.
+- modüller klasörümüz de herhangi bir modül geliştirip bitirdiğimiz de veya geliştirmekte olduğumuz da web siteden modüller sekmemiz de görünecek.
+- her modülü aktif etmemiz gerekecek aktif edilen modül bir daha aktif etmemiz gerekmeyecek.
+- üyelik sistemimiz olacak.
+- üyelik sisteminde kredilerimiz olacak ve her üyenin kredisi olacak.
+- her modülün bir fiyatı olacak kredi olarak kredisi yettiği modülleri satın alabilecek ve aktifleştirebilecek.
+- aktifleştirilen modul sidebar da modüllerim kısmında görünecek eğer modülü yok ise boş olacak ve modül satın alınız diye modüller sayfasına gönderilecek.
+- projeyi kullandığımız sunucu ipmiz 88.218.130.67 
+
+
+## Teknoloji Seçimi
+1. [ ] Backend: Node.js + NestJS (JavaScript/TypeScript tek dil avantajı)
+2. [ ] Frontend: React + Nuxt.js + Next.js (SSR performans avantajı)
+3. [ ] Veritabanı olarak PostgreSQL
+4. [ ] Mikroservis mimarisi kurgulanmalı
+7. [ ] Alternatif teknoloji yığını değerlendirilmeli
+8. [ ] Gerçek zamanlı iletişim: Socket.io (anlık bildirimler için)
+
+## Temel Altyapı Modülleri
+1. [ ] Kullanıcı Yönetimi ve Kimlik Doğrulama Sistemi
+   1. [ ] Oturum yönetimi (JWT tabanlı)
+   2. [ ] Çok faktörlü kimlik doğrulama
+   3. [ ] Şifre politikaları
+2. [ ] Yetkilendirme ve İzin Sistemi
+   1. [ ] Rol tabanlı erişim kontrolü
+   2. [ ] Dinamik izin atamaları
+   3. [ ] Modül bazlı erişim kısıtlamaları
+3. [ ] Çok Dilli Destek Altyapısı
+   1. [ ] Dil dosyalarının yönetimi
+   2. [ ] Dinamik dil değiştirme
+4. [ ] Bildirim Sistemi
+   1. [ ] E-posta bildirimleri
+   2. [ ] SMS bildirimleri
+   3. [ ] Uygulama içi bildirimler
+   4. [ ] Push bildirimleri
+5. [ ] Raporlama Motoru
+   1. [ ] Dinamik rapor tasarımı
+   2. [ ] Rapor şablonları
+   3. [ ] Excel, PDF, CSV dışa aktarma
+6. [ ] API Gateway ve Entegrasyon Arabirimi
+   1. [ ] Harici sistemlerle entegrasyonlar
+   2. [ ] API güvenliği ve rate limiting
+7. [ ] Olay Kaydı ve İzleme (Logging)
+   1. [ ] Merkezi log yönetimi
+   2. [ ] Hata izleme ve raporlama
+8. [ ] İş Akışı Motoru
+   1. [ ] Dinamik iş akışı tasarımı
+   2. [ ] Onay mekanizmaları
+   3. [ ] İş akışı izleme
+
+## Finans Yönetimi Modülü
+1. [ ] Genel Muhasebe
+   1. [ ] Muhasebe fişleri
+   2. [ ] Hesap planı yönetimi
+   3. [ ] Yevmiye defteri
+   4. [ ] Büyük defter
+   5. [ ] Mizan raporları
+   6. [ ] Dövizli işlemler
+2. [ ] Alacak Yönetimi
+   1. [ ] Müşteri hesap ekstresi
+   2. [ ] Vade analizi
+   3. [ ] Tahsilat takibi
+   4. [ ] Otomatik tahsilat işlemleri
+3. [ ] Borç Yönetimi
+   1. [ ] Tedarikçi hesap ekstresi
+   2. [ ] Ödeme planlaması
+   3. [ ] Çek/senet yönetimi
+4. [ ] Bütçe Yönetimi
+   1. [ ] Bütçe oluşturma
+   2. [ ] Bütçe revizyon yönetimi
+   3. [ ] Bütçe-fiili karşılaştırma
+5. [ ] Nakit Akışı Yönetimi
+   1. [ ] Nakit akış tahmini
+   2. [ ] Banka hesapları yönetimi
+   3. [ ] Nakit toplama ve dağıtım
+6. [ ] Sabit Kıymetler
+   1. [ ] Demirbaş takibi
+   2. [ ] Amortisman hesaplamaları
+   3. [ ] Sabit kıymet devir işlemleri
+7. [ ] Maliyet Muhasebesi
+   1. [ ] Maliyet merkezleri
+   2. [ ] Dağıtım anahtarları
+   3. [ ] Maliyet dağıtımları
+
+## Satış Yönetimi Modülü
+1. [ ] Müşteri İlişkileri Yönetimi (CRM)
+   1. [ ] Müşteri veri tabanı
+   2. [ ] Potansiyel müşteri takibi
+   3. [ ] Müşteri segmentasyonu
+   4. [ ] Kampanya yönetimi
+2. [ ] Teklif Yönetimi
+   1. [ ] Teklif oluşturma
+   2. [ ] Teklif onaylama
+   3. [ ] Teklif revizyon yönetimi
+3. [ ] Sipariş Yönetimi
+   1. [ ] Sipariş oluşturma
+   2. [ ] Sipariş onaylama
+   3. [ ] Sipariş durumu takibi
+4. [ ] Faturalama
+   1. [ ] Fatura oluşturma
+   2. [ ] Toplu faturalama
+   3. [ ] e-Fatura entegrasyonu
+5. [ ] Satış Sonrası Hizmetler
+   1. [ ] Garanti takibi
+   2. [ ] Servis talepleri
+   3. [ ] Müşteri memnuniyeti ölçümü
+
+## Satın Alma Yönetimi Modülü
+1. [ ] Tedarikçi Yönetimi
+   1. [ ] Tedarikçi veri tabanı
+   2. [ ] Tedarikçi performans takibi
+   3. [ ] Tedarikçi değerlendirme
+2. [ ] Talep Yönetimi
+   1. [ ] Satın alma talep oluşturma
+   2. [ ] Talep onaylama süreci
+   3. [ ] Talep konsolidasyonu
+3. [ ] Teklif Toplama
+   1. [ ] Teklif isteme (RFQ) süreci
+   2. [ ] Tedarikçi tekliflerini karşılaştırma
+   3. [ ] En uygun teklif seçimi
+4. [ ] Sipariş Yönetimi
+   1. [ ] Satın alma siparişi oluşturma
+   2. [ ] Sipariş takibi
+   3. [ ] Teslimat kontrol
+5. [ ] Fatura Kontrol
+   1. [ ] Fatura-irsaliye-sipariş eşleştirme
+   2. [ ] Fatura onay süreci
+   3. [ ] Ödeme planı oluşturma
+
+## Stok ve Envanter Yönetimi Modülü
+1. [ ] Depo Yönetimi
+   1. [ ] Çoklu depo yapısı
+   2. [ ] Depo içi lokasyon yönetimi
+   3. [ ] Depo transfer işlemleri
+2. [ ] Stok Hareketleri
+   1. [ ] Mal kabul
+   2. [ ] Mal çıkış
+   3. [ ] Sayım farkı
+   4. [ ] Fire/zayi kayıtları
+3. [ ] Lot/Seri Numarası Takibi
+   1. [ ] Lot bazlı izlenebilirlik
+   2. [ ] Seri numarası takibi
+   3. [ ] FIFO/LIFO/FEFO yönetimi
+4. [ ] Envanter Sayımı
+   1. [ ] Planlı sayım
+   2. [ ] Dönemsel sayım
+   3. [ ] Anlık sayım
+5. [ ] Stok Değerleme
+   1. [ ] Ortalama maliyet
+   2. [ ] FIFO/LIFO maliyetlendirme
+   3. [ ] Standart maliyet
+
+## Üretim Yönetimi Modülü
+1. [ ] Üretim Planlama
+   1. [ ] Ana üretim planı
+   2. [ ] Kapasite planlaması
+   3. [ ] Malzeme ihtiyaç planlaması
+2. [ ] Malzeme İhtiyaç Planlaması (MRP)
+   1. [ ] Hammadde ihtiyaç hesaplama
+   2. [ ] Üretim emirleri oluşturma
+   3. [ ] Satın alma talepleri oluşturma
+3. [ ] Kapasite Planlama
+   1. [ ] İş merkezleri tanımlama
+   2. [ ] Kapasite hesaplamaları
+   3. [ ] İş yükü dengeleme
+4. [ ] İş Emri Yönetimi
+   1. [ ] İş emri açma
+   2. [ ] İş emri yürütme
+   3. [ ] İş emri kapama
+5. [ ] Kalite Kontrol
+   1. [ ] Hammadde kalite kontrol
+   2. [ ] Üretim içi kalite kontrol
+   3. [ ] Nihai ürün kalite kontrol
+
+## İnsan Kaynakları Yönetimi Modülü
+1. [ ] Personel Özlük Bilgileri
+   1. [ ] Personel dosyası
+   2. [ ] İşe giriş-çıkış işlemleri
+   3. [ ] Personel değişiklik takibi
+2. [ ] İzin ve Devamsızlık Takibi
+   1. [ ] İzin hakları yönetimi
+   2. [ ] İzin talep ve onaylama
+   3. [ ] Devamsızlık raporları
+3. [ ] Performans Değerlendirme
+   1. [ ] Performans kriterleri
+   2. [ ] Değerlendirme süreçleri
+   3. [ ] Kariyer planlama
+4. [ ] Eğitim Yönetimi
+   1. [ ] Eğitim ihtiyaç analizi
+   2. [ ] Eğitim planlama
+   3. [ ] Eğitim etkinlik ölçümü
+5. [ ] Bordro ve Maaş Yönetimi
+   1. [ ] Maaş hesaplama
+   2. [ ] SGK bildirimleri
+   3. [ ] Vergi hesaplamaları
+   4. [ ] Ek ödemeler ve kesintiler
+
+## Proje Yönetimi Modülü
+1. [ ] Proje Planlama
+   1. [ ] Proje tanımlama
+   2. [ ] İş kırılım yapısı
+   3. [ ] Aktivite planlama
+2. [ ] Kaynak Yönetimi
+   1. [ ] Kaynak atama
+   2. [ ] Kaynak kullanımı takibi
+   3. [ ] Kaynak çakışma kontrolü
+3. [ ] Zaman Takibi
+   1. [ ] Aktivite ilerleme takibi
+   2. [ ] Zaman çizelgeleri
+   3. [ ] Gecikme analizi
+4. [ ] Bütçe Takibi
+   1. [ ] Proje bütçesi oluşturma
+   2. [ ] Maliyet takibi
+   3. [ ] Bütçe-fiili karşılaştırma
+5. [ ] Gantt Şeması
+   1. [ ] Görsel proje takibi
+   2. [ ] Kritik yol analizi
+   3. [ ] Milestone takibi
+
+## Belge Yönetim Sistemi Modülü
+1. [ ] Doküman Deposu
+   1. [ ] Doküman yükleme ve kategorilendirme
+   2. [ ] Doküman arama
+   3. [ ] Doküman paylaşımı
+2. [ ] Versiyon Kontrolü
+   1. [ ] Doküman versiyonlama
+   2. [ ] Değişiklik geçmişi
+   3. [ ] Eski versiyonlara erişim
+3. [ ] Arama ve Filtreleme
+   1. [ ] Gelişmiş arama
+   2. [ ] Meta veri ile filtreleme
+   3. [ ] Tam metin araması
+4. [ ] OCR Desteği
+   1. [ ] Taranmış dokümanları tanıma
+   2. [ ] İçerik indexleme
+   3. [ ] Aranabilir PDF'ler
+
+## Müşteri Hizmetleri ve Destek Modülü
+1. [ ] Talep/Ticket Yönetimi
+   1. [ ] Müşteri talep kaydı
+   2. [ ] Talep atama ve yönlendirme
+   3. [ ] Talep çözüm süreci
+2. [ ] SLA Takibi
+   1. [ ] Hizmet seviyesi taahhütleri
+   2. [ ] Yanıt ve çözüm süresi takibi
+   3. [ ] SLA ihlal bildirimleri
+3. [ ] Yardım Masası
+   1. [ ] Çağrı merkezi entegrasyonu
+   2. [ ] Talep kategorilendirme
+   3. [ ] Destek personeli yönetimi
+4. [ ] Bilgi Tabanı
+   1. [ ] Sık sorulan sorular
+   2. [ ] Çözüm önerileri
+   3. [ ] Kullanım kılavuzları
+
+## E-Dönüşüm Entegrasyonları
+1. [ ] e-Fatura
+   1. [ ] e-Fatura oluşturma
+   2. [ ] GİB entegrasyonu
+   3. [ ] e-Fatura arşivleme
+2. [ ] e-Arşiv
+   1. [ ] e-Arşiv fatura oluşturma
+   2. [ ] Raporlama
+   3. [ ] Saklama
+3. [ ] e-İrsaliye
+   1. [ ] e-İrsaliye oluşturma
+   2. [ ] Sevkiyat takibi
+   3. [ ] GİB bildirimleri
+4. [ ] e-Defter
+   1. [ ] Yasal defter oluşturma
+   2. [ ] Berat dosyaları
+   3. [ ] GİB yükleme
+5. [ ] e-Mutabakat
+   1. [ ] BA/BS mutabakatı
+   2. [ ] Cari hesap mutabakatı
+   3. [ ] Otomatik mutabakat süreci
+
+## İş Zekası ve Raporlama Modülü
+1. [ ] Dashboard'lar
+   1. [ ] Yönetici özet ekranları
+   2. [ ] Modül bazlı dashboard'lar
+   3. [ ] Kişiselleştirilebilir görünüm
+2. [ ] Analitik Raporlar
+   1. [ ] Detaylı analiz raporları
+   2. [ ] Trend analizleri
+   3. [ ] Tahminleme
+3. [ ] KPI İzleme
+   1. [ ] Performans göstergeleri
+   2. [ ] Hedef-gerçekleşme takibi
+   3. [ ] Otomatik uyarılar
+4. [ ] Özelleştirilebilir Raporlar
+   1. [ ] Rapor tasarımcısı
+   2. [ ] Parametrik raporlar
+   3. [ ] Çapraz tablolar
+
+## Tedarik Zinciri Yönetimi Modülü
+1. [ ] Lojistik Yönetimi
+   1. [ ] Nakliye planlama
+   2. [ ] Araç yönetimi
+   3. [ ] Taşıma maliyetleri
+2. [ ] Rota Planlama
+   1. [ ] Optimum rota belirleme
+   2. [ ] Teslimat programı
+   3. [ ] Rota optimizasyonu
+3. [ ] Dağıtım Yönetimi
+   1. [ ] Dağıtım merkezi yönetimi
+   2. [ ] Yük optimizasyonu
+   3. [ ] Cross-docking
+4. [ ] Sevkiyat Takibi
+   1. [ ] Gerçek zamanlı sevkiyat izleme
+   2. [ ] Teslimat onayları
+   3. [ ] İade yönetimi
+
+## Bakım Yönetimi Modülü
+1. [ ] Planlı Bakımlar
+   1. [ ] Bakım planları oluşturma
+   2. [ ] Bakım takvimi
+   3. [ ] Bakım çizelgeleri
+2. [ ] Arıza Bildirimleri
+   1. [ ] Arıza kaydı
+   2. [ ] Arıza atama
+   3. [ ] Çözüm takibi
+3. [ ] Yedek Parça Yönetimi
+   1. [ ] Yedek parça envanteri
+   2. [ ] Kritik parça takibi
+   3. [ ] Parça kullanım geçmişi
+4. [ ] Bakım Takvimi
+   1. [ ] Önleyici bakım takvimi
+   2. [ ] Bakım hatırlatıcıları
+   3. [ ] Bakım geçmişi
+
+## Kalite Yönetim Sistemi Modülü
+1. [ ] Kalite Kontrol Prosedürleri
+   1. [ ] Kontrol noktaları
+   2. [ ] Kalite şartnameleri
+   3. [ ] Ölçüm kriterleri
+2. [ ] Uygunsuzluk Yönetimi
+   1. [ ] Uygunsuzluk kaydı
+   2. [ ] Kök neden analizi
+   3. [ ] Aksiyon takibi
+3. [ ] Düzeltici/Önleyici Faaliyetler
+   1. [ ] DÖF kayıtları
+   2. [ ] DÖF takibi
+   3. [ ] Etkinlik ölçümü
+4. [ ] Denetim Yönetimi
+   1. [ ] İç denetimler
+   2. [ ] Tedarikçi denetimleri
+   3. [ ] Dış denetim hazırlığı
+
+## Mobil Uygulama Desteği
+1. [ ] Sahada Kullanım
+   1. [ ] Mobil satış
+   2. [ ] Saha servis
+   3. [ ] Envanter sayımı
+2. [ ] Bildirim Sistemi
+   1. [ ] Anında bildirimler
+   2. [ ] Görev atamaları
+   3. [ ] Hatırlatıcılar
+3. [ ] Onay Mekanizmaları
+   1. [ ] Mobil onaylar
+   2. [ ] Hızlı aksiyon alma
+   3. [ ] Döküman erişimi
+
+## İş Ortağı Portalı
+1. [ ] Tedarikçi Portalı
+   1. [ ] Sipariş görüntüleme
+   2. [ ] Teslimat bildirimi
+   3. [ ] Fatura yükleme
+2. [ ] Müşteri Portalı
+   1. [ ] Sipariş takibi
+   2. [ ] Hesap ekstreleri
+   3. [ ] Destek talepleri
+3. [ ] İş Ortağı İşlemleri
+   1. [ ] Belge paylaşımı
+   2. [ ] İletişim
+   3. [ ] Performans görüntüleme
+
+## Entegrasyon İhtiyaçları
+1. [ ] Banka Entegrasyonları
+   1. [ ] Hesap hareketleri
+   2. [ ] EFT/Havale
+   3. [ ] Otomatik mutabakat
+2. [ ] E-Ticaret Platformları
+   1. [ ] B2C satış kanalları
+   2. [ ] Pazar yeri entegrasyonları
+   3. [ ] Ürün senkronizasyonu
+3. [ ] B2B/B2C Sistemleri
+   1. [ ] B2B portalı
+   2. [ ] Web mağazası
+   3. [ ] Mobil uygulamalar
+4. [ ] IoT Cihazları ve Sensörler
+   1. [ ] Üretim hattı sensörleri
+   2. [ ] Depo otomasyonu
+   3. [ ] RFID entegrasyonu
+5. [ ] Üçüncü Parti Yazılımlar
+   1. [ ] CRM sistemleri
+   2. [ ] E-posta pazarlama
+   3. [ ] BI araçları
+6. [ ] Resmi Kurumlar
+   1. [ ] GİB (Gelir İdaresi Başkanlığı)
+   2. [ ] SGK
+   3. [ ] Ticaret Bakanlığı
+
+## Teknik Görevler
+1. [ ] Veritabanı Tasarımı
+   1. [ ] Veri modeli oluşturma
+   2. [ ] İlişkisel şema
+   3. [ ] Performans optimizasyonu
+2. [ ] Mikroservis Mimarisi Tasarımı
+   1. [ ] Servis sınırlarını belirleme
+   2. [ ] API tasarımı
+   3. [ ] Servisler arası iletişim
+3. [ ] Kullanıcı Arayüzü Tasarımı (UI/UX)
+   1. [ ] Wireframe oluşturma
+   2. [ ] Kullanıcı deneyimi tasarımı
+   3. [ ] Responsive tasarım
+4. [ ] CI/CD Pipeline Kurulumu
+   1. [ ] Otomatik build
+   2. [ ] Otomatik test
+   3. [ ] Otomatik deployment
+5. [ ] Test Otomasyonu
+   1. [ ] Birim testleri
+   2. [ ] Entegrasyon testleri
+   3. [ ] UI testleri
+6. [ ] Performans Optimizasyonu
+   1. [ ] Yük testleri
+   2. [ ] Darboğaz analizi
+   3. [ ] Ölçeklendirme
+7. [ ] Güvenlik Testleri
+   1. [ ] Penetrasyon testleri
+   2. [ ] Kod güvenliği analizi
+   3. [ ] Güvenlik açığı taraması
+8. [ ] Felaket Kurtarma Planı
+   1. [ ] Yedekleme stratejisi
+   2. [ ] Veri kurtarma testleri
+   3. [ ] İş sürekliliği planı
+
+## Varlık Yönetimi Modülü
+1. [ ] Varlık Envanteri
+   1. [ ] Varlık kategorilendirme
+   2. [ ] Varlık yaşam döngüsü
+   3. [ ] Varlık değerleme
+2. [ ] Varlık İzleme
+   1. [ ] Konum takibi
+   2. [ ] Varlık durumu
+   3. [ ] Kullanım geçmişi
+3. [ ] Varlık Tahsisi
+   1. [ ] Departman/çalışan atama
+   2. [ ] Geçici tahsis işlemleri
+   3. [ ] İade yönetimi
+4. [ ] Sigorta Takibi
+   1. [ ] Sigorta poliçeleri
+   2. [ ] Yenileme takibi
+   3. [ ] Hasar kaydı
+
+## Risk Yönetimi Modülü
+1. [ ] Risk Tanımlama
+   1. [ ] Risk kategorileri
+   2. [ ] Risk analizi
+   3. [ ] Risk değerlendirme
+2. [ ] Risk İzleme
+   1. [ ] Risk göstergeleri
+   2. [ ] Erken uyarı sistemi
+   3. [ ] Risk raporları
+3. [ ] Risk Azaltma
+   1. [ ] Eylem planları
+   2. [ ] Sorumluluk atamaları
+   3. [ ] Etkinlik ölçümü
+4. [ ] Uyum Yönetimi
+   1. [ ] Yasal gereklilikler
+   2. [ ] İç politikalar
+   3. [ ] Denetim hazırlığı
+
+## Yapay Zeka ve Veri Analizi Modülü
+1. [ ] Tahmine Dayalı Analitik
+   1. [ ] Satış tahmini
+   2. [ ] Talep tahmini
+   3. [ ] Trend analizi
+2. [ ] Anomali Tespiti
+   1. [ ] Dolandırıcılık tespiti
+   2. [ ] Kalite sapmaları
+   3. [ ] Performans anomalileri
+3. [ ] Doğal Dil İşleme
+   1. [ ] Müşteri geri bildirim analizi
+   2. [ ] Otomatik kategorizasyon
+   3. [ ] Metin özetleme
+4. [ ] Karar Destek Sistemleri
+   1. [ ] Senaryo analizi
+   2. [ ] Optimizasyon modelleri
+   3. [ ] Öneri motorları
+
+## İş Sağlığı ve Güvenliği Modülü
+1. [ ] İSG Olay Yönetimi
+   1. [ ] Kaza kayıtları
+   2. [ ] Ramak kala bildirimleri
+   3. [ ] Kök neden analizi
+2. [ ] Risk Değerlendirmesi
+   1. [ ] Tehlike tanımlama
+   2. [ ] Risk puanlama
+   3. [ ] Önleyici tedbirler
+3. [ ] İSG Eğitim Takibi
+   1. [ ] Zorunlu eğitimler
+   2. [ ] Sertifika takibi
+   3. [ ] Yenileme planlaması
+4. [ ] Yasal Uyumluluk
+   1. [ ] Yasal gereklilik takibi
+   2. [ ] Periyodik kontroller
+   3. [ ] Yasal raporlama
+
+## Çevre Yönetimi Modülü
+1. [ ] Atık Yönetimi
+   1. [ ] Atık envanteri
+   2. [ ] Atık beyanları
+   3. [ ] Bertaraf takibi
+2. [ ] Enerji Yönetimi
+   1. [ ] Enerji tüketim takibi
+   2. [ ] Verimlilik ölçümü
+   3. [ ] Tasarruf planlaması
+3. [ ] Emisyon Takibi
+   1. [ ] Emisyon hesaplamaları
+   2. [ ] Karbon ayak izi
+   3. [ ] Emisyon raporlaması
+4. [ ] Çevresel Etki Değerlendirmesi
+   1. [ ] Etki analizi
+   2. [ ] Çevresel performans
+   3. [ ] Sürdürülebilirlik raporları
+
+## E-Öğrenme Modülü
+1. [ ] İçerik Yönetimi
+   1. [ ] Kurs içeriği oluşturma
+   2. [ ] İçerik kütüphanesi
+   3. [ ] Multimedya desteği
+2. [ ] Sınav ve Değerlendirme
+   1. [ ] Sınav oluşturma
+   2. [ ] Otomatik değerlendirme
+   3. [ ] Sertifikalandırma
+3. [ ] Öğrenim Takibi
+   1. [ ] İlerleme raporları
+   2. [ ] Öğrenim analitikleri
+   3. [ ] Yetkinlik haritaları
+4. [ ] Sosyal Öğrenme
+   1. [ ] Forum ve tartışma alanları
+   2. [ ] İşbirlikçi öğrenme
+   3. [ ] Mentorluk programları
+
+## Uygulama Geliştirme Platformu
+1. [ ] Low-Code Geliştirme
+   1. [ ] Görsel form tasarımcısı
+   2. [ ] Süreç modelleyici
+   3. [ ] İş kuralları motoru
+2. [ ] Özel Raporlar
+   1. [ ] Rapor şablonları
+   2. [ ] Görsel rapor tasarımcısı
+   3. [ ] Parametre yönetimi
+3. [ ] Entegrasyon Araçları
+   1. [ ] Webhook desteği
+   2. [ ] API oluşturma
+   3. [ ] Veri aktarım araçları
+4. [ ] Veri İşleme ve ETL
+   1. [ ] Veri dönüşümleri
+   2. [ ] Veri doğrulama
+   3. [ ] Zamanlanmış işler
+
+## Proje Önceliklendirme ve Fazlandırma
+
+### Faz 1: Temel Sistem
+1. [ ] Teknoloji seçimi ve mimari tasarım
+2. [ ] Kullanıcı yönetimi ve kimlik doğrulama
+3. [ ] Yetkilendirme ve izin sistemi
+4. [ ] Temel veritabanı yapısı
+5. [ ] Finans yönetimi modülü (temel fonksiyonlar)
+6. [ ] Satış yönetimi modülü (temel fonksiyonlar)
+7. [ ] Satın alma modülü (temel fonksiyonlar)
+8. [ ] Stok ve envanter yönetimi (temel fonksiyonlar)
+
+### Faz 2: Operasyonel Modüller
+1. [ ] Finans yönetimi (gelişmiş özellikler)
+2. [ ] Üretim yönetimi modülü
+3. [ ] İnsan kaynakları yönetimi modülü
+4. [ ] Proje yönetimi modülü
+5. [ ] İş akışı motoru
+6. [ ] Raporlama motoru
+7. [ ] Belge yönetim sistemi
+
+### Faz 3: Genişletilmiş Özellikler
+1. [ ] Müşteri hizmetleri ve destek modülü
+2. [ ] E-Dönüşüm entegrasyonları
+3. [ ] İş zekası ve raporlama modülü
+4. [ ] Tedarik zinciri yönetimi modülü
+5. [ ] Bakım yönetimi modülü
+6. [ ] Kalite yönetim sistemi modülü
+7. [ ] Mobil uygulama desteği
+
+### Faz 4: Gelişmiş Analitik ve Entegrasyonlar
+1. [ ] Yapay zeka ve veri analizi modülü
+2. [ ] İş ortağı portalı
+3. [ ] Uygulama geliştirme platformu
+4. [ ] IoT entegrasyonları
+5. [ ] Risk yönetimi modülü
+6. [ ] Çevre yönetimi modülü
+7. [ ] E-Öğrenme modülü
+
+## Geliştirme Metodolojisi
+1. [ ] Çevik (Agile) Metodoloji Kurulumu
+   1. [ ] Scrum veya Kanban süreçleri
+   2. [ ] Sprint planlama
+   3. [ ] Daily standups
+   4. [ ] Sprint review ve retrospektifler
+2. [ ] DevOps Kültürü Oluşturma
+   1. [ ] Sürekli entegrasyon (CI)
+   2. [ ] Sürekli teslim (CD)
+   3. [ ] Altyapı olarak kod (Infrastructure as Code)
+3. [ ] Test Stratejisi
+   1. [ ] Test piramidi yaklaşımı
+   2. [ ] Test otomasyonu
+   3. [ ] Kullanıcı kabul testleri
+4. [ ] Dokümantasyon Standartları
+   1. [ ] API dokümantasyonu
+   2. [ ] Kullanıcı kılavuzları
+   3. [ ] Teknik dokümantasyon
+
+## Başarı Kriterleri ve KPI'lar
+1. [ ] Proje KPI'ları
+   1. [ ] Bütçe içinde kalma
+   2. [ ] Zaman çizelgesine uyum
+   3. [ ] Kapsam gerçekleştirme oranı
+2. [ ] Teknik KPI'lar
+   1. [ ] Sistem performansı
+   2. [ ] Hata oranları
+   3. [ ] Güvenlik değerlendirmeleri
+3. [ ] İş KPI'ları
+   1. [ ] ROI (Yatırım getirisi)
+   2. [ ] Kullanıcı adaptasyonu
+   3. [ ] Proses otomasyonu kazanımları
+4. [ ] Kullanıcı Memnuniyeti
+   1. [ ] Kullanıcı geri bildirimleri
+   2. [ ] Kullanım metrikleri
+   3. [ ] Destek talebi oranları
